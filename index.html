@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AndLua风格视频播放器 - 白色版</title>
+<style>
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Arial', sans-serif;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background: linear-gradient(135deg, #f9f9f9, #f0f0f0);
+  color: #333333;
+  line-height: 1.6;
+  padding: 16px;
+  touch-action: manipulation;
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 0;
+}
+
+.menu-area {
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 16px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+  border: 1px solid #e0e0e0;
+}
+
+.input-field {
+  width: 100%;
+  height: 52px;
+  margin: 12px 0 20px;
+  padding: 0 22px;
+  border-radius: 26px;
+  border: 1px solid #cccccc;
+  background: rgba(255, 255, 255, 0.9);
+  color: #333333;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  font-weight: bold;
+  font-size: 16px;
+  transition: all 0.2s;
+}
+
+.input-field:focus {
+  outline: none;
+  border-color: #64b5f6;
+  box-shadow: 0 0 0 3px rgba(100, 181, 246, 0.3);
+}
+
+.input-field::placeholder {
+  color: #9e9e9e;
+  opacity: 0.8;
+}
+
+.button-row {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 8px 0;
+  justify-content: space-between;
+}
+
+.button {
+  flex: 0 0 calc(25% - 8px);
+  height: 48px;
+  margin: 4px;
+  border-radius: 24px;
+  background: linear-gradient(135deg, #f5f5f5, #e0e0e0);
+  color: #424242;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s;
+  user-select: none;
+  border: none;
+  font-size: 14px;
+  text-align: center;
+  padding: 0 8px;
+  border: 1px solid #e0e0e0;
+}
+
+.button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.button:active {
+  transform: scale(0.96);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.category-button {
+  background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+  font-weight: bold;
+  border: 1px solid #90caf9;
+  color: #1565c0;
+}
+
+.button.blue {
+  background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+  color: #1976d2;
+  border: 1px solid #90caf9;
+}
+
+.button.red {
+  background: linear-gradient(135deg, #ffebee, #ffcdd2);
+  color: #d32f2f;
+  border: 1px solid #ef9a9a;
+}
+
+.button.purple {
+  background: linear-gradient(135deg, #f3e5f5, #e1bee7);
+  color: #7b1fa2;
+  border: 1px solid #ce93d8;
+}
+
+.webview-container {
+  width: 100%;
+  height: 65vh;
+  margin: 20px 0;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  background: #ffffff;
+  transition: all 0.3s ease;
+  border: 1px solid #e0e0e0;
+}
+
+.webview {
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: #ffffff;
+}
+
+.hidden {
+  display: none;
+}
+
+.toast {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255, 255, 255, 0.95);
+  color: #333333;
+  padding: 14px 28px;
+  border-radius: 30px;
+  z-index: 1000;
+  display: none;
+  font-size: 16px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+  border: 1px solid #e0e0e0;
+}
+
+/* 全屏模式样式 */
+.fullscreen-mode .menu-area {
+  display: none;
+}
+
+.fullscreen-mode .webview-container {
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+  border-radius: 0;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 100;
+}
+
+.landscape-mode .webview-container {
+  transform: rotate(90deg);
+  transform-origin: center center;
+  width: 100vh;
+  height: 100vw;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  margin-top: -50vw;
+  margin-left: -50vh;
+}
+
+/* 全屏控制按钮 */
+.fullscreen-controls {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  z-index: 101;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  transition: opacity 0.3s ease;
+}
+
+.fullscreen-controls.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.exit-fullscreen-btn {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  color: #333333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  font-size: 24px;
+  transition: all 0.3s ease;
+  border: 1px solid #e0e0e0;
+}
+
+.exit-fullscreen-btn:hover {
+  background: rgba(255, 255, 255, 1);
+  transform: scale(1.1);
+}
+
+/* 触摸提示 */
+.touch-hint {
+  position: fixed;
+  bottom: 20px;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  color: rgba(0, 0, 0, 0.7);
+  font-size: 16px;
+  z-index: 102;
+  transition: opacity 0.5s ease;
+  text-shadow: 0 2px 4px rgba(255, 255, 255, 0.8);
+}
+
+.touch-hint.hidden {
+  opacity: 0;
+}
+
+@media (max-width: 768px) {
+  .button {
+    flex: 0 0 calc(50% - 8px);
+    font-size: 13px;
+  }
+
+  .webview-container {
+    height: 55vh;
+  }
+}
+
+@media (max-width: 480px) {
+  .button {
+    flex: 0 0 calc(50% - 6px);
+    margin: 3px;
+    font-size: 12px;
+    height: 44px;
+  }
+
+  .input-field {
+    height: 48px;
+    font-size: 15px;
+    padding: 0 18px;
+  }
+}
+</style>
+</head>
+<body>
+<div class="container">
+<div class="menu-area" id="menuArea">
+<input type="text" class="input-field" id="inputUrl" placeholder="视频地址/名称 音乐/漫画名称...">
+
+<div class="button-row">
+<div class="button category-button" data-category="video">视频解析</div>
+<div class="button category-button" data-category="resource">名称搜索</div>
+<div class="button category-button" data-category="music">音乐搜索</div>
+<div class="button category-button" data-category="search">漫画搜索</div>
+</div>
+
+<!-- 视频解析按钮 -->
+<div class="hidden" id="videoButtons">
+<div class="button-row">
+<div class="button blue" data-url="https://www.yemu.xyz/v/d.php?url={url}">播放一</div>
+<div class="button blue" data-url="https://jx.xmflv.cc/?url={url}">播放二</div>
+<div class="button blue" data-url="https://player.bingdou.vip/?url={url}">播放三</div>
+<div class="button blue" data-url="https://www.yemu.xyz/?url={url}">播放四</div>
+</div>
+<div class="button-row">
+<div class="button red" data-url="http://111.6.188.162/bbqq.php?url={url}">播放五</div>
+<div class="button red" data-url="https://www.pouyun.com/?url={url}">播放六</div>
+<div class="button red" data-url="https://jx.2s0.cn/player/?url={url}">播放七</div>
+<div class="button red" data-url="https://jx.2s0.cn/player/analysis.php?v={url}">播放八</div>
+</div>
+<div class="button-row">
+<div class="button red" data-url="https://jx.nnxv.cn/tv.php?url={url}">播放九</div>
+<div class="button red" data-url="https://jx.playerjy.com/?url={url}">超强解析</div>
+<div class="button blue" data-url="https://jx.bozrc.com:4433/player/?url={url}">解析十</div>
+<div class="button blue" data-url="https://jx.mw0.cc/?url={url}">解析十一</div>
+</div>
+</div>
+
+<!-- 资源搜索按钮 -->
+<div class="hidden" id="resourceButtons">
+<div class="button-row">
+<div class="button blue" data-url="https://z1.im1907.top/?jx={text}">名字搜一</div>
+<div class="button blue" data-url="http://v9j.net/so.php?wd={text}">名字搜二</div>
+<div class="button blue" data-url="https://xunlei8.me/s/{text}.html">名字搜三</div>
+<div class="button blue" data-url="https://www.bt-tt.com/search/{text}">名字搜四</div>
+</div>
+<div class="button-row">
+<div class="button red" data-url="http://yinghuadm.cn/search_-------------.html?wd={text}">资源一</div>
+<div class="button red" data-url="https://sszzyy.com/index.php/vod/search.html?wd={text}">资源二</div>
+<div class="button blue" data-url="https://www.ylys.tv/vodsearch/-------------/wd/{text}">资源三</div>
+<div class="button blue" data-url="https://www.czzymovie.com/xsss1O1?q={text}">资源四</div>
+</div>
+<div class="button-row">
+<div class="button red" data-url="http://660f.com/vodsearch/-------------.html?wd{text}">资源五</div>
+</div>
+<div class="button-row">
+<div class="button red" data-url="https://www.ynqihan.com/">影视一</div>
+<div class="button red" data-url="https://haifengyi.com/">影视二</div>
+<div class="button blue" data-url="https://www.puromotors.com/">影视三</div>
+</div>
+</div>
+
+<!-- 音乐搜索按钮 -->
+<div class="hidden" id="musicButtons">
+<div class="button-row">
+<div class="button red" data-url="https://www.1mp3.top/?key={text}&search=1">音乐一</div>
+<div class="button red" data-url="https://www.gequhai.com/s/{text}">音乐二</div>
+<div class="button blue" data-url="https://pjmp3.com/search.php?keyword={text}">音乐三</div>
+<div class="button blue" data-url="https://www.gequbao.com/s/{text}">音乐四</div>
+</div>
+<div class="button-row">
+<div class="button blue" data-url="https://music.mcya.cn/">随机音乐</div>
+<div class="button blue" data-url="https://mu-jie.cc/musicBox/?src=www.jspoo.com#/">音源一</div>
+<div class="button blue" data-url="https://suapi.net/tool/music">音源二</div>
+<div class="button blue" data-url="https://tools.liumingye.cn/music/">音源三</div>
+</div>
+</div>
+
+<!-- 漫画搜索按钮 -->
+<div class="hidden" id="searchButtons">
+<div class="button-row">
+<div class="button blue" data-url="https://www.mhw1.com/search?key={text}">漫画一</div>
+<div class="button blue" data-url="https://www.gfmh.app/index.php/search?key={text}">漫画二</div>
+<div class="button blue" data-url="https://www.colamanga.com/search?type=1&searchString={text}">漫画三</div>
+<div class="button blue" data-url="http://m.bengou.co/statics/search.aspx?key={text}">漫画四</div>
+</div>
+<div class="button-row">
+<div class="button blue" data-url="https://godamh.com/s/{text}">漫画五</div>
+<div class="button blue" data-url="https://cn.baozimhcn.com/search?q={text}">漫画六</div>
+<div class="button blue" data-url="http://rumanhua1.com/?src=www.jspoo.com">漫源一</div>
+</div>
+</div>
+
+<div class="button-row">
+<div class="button purple" id="btnOpenInBrowser">浏览器打开</div>
+<div class="button purple" id="btnCopyCurrentUrl">复制链接</div>
+<div class="button red" id="btnRefresh">刷新页面</div>
+<div class="button red" id="btnCollapseAll">收起所有</div>
+</div>
+
+<div class="button-row">
+<div class="button" id="btnPortraitFullscreen">竖屏全屏</div>
+<div class="button" id="btnLandscapeFullscreen">横屏全屏</div>
+</div>
+</div>
+
+<div class="webview-container">
+<iframe class="webview" id="webView" src="about:blank"></iframe>
+</div>
+</div>
+
+<!-- 全屏控制按钮 -->
+<div class="fullscreen-controls hidden" id="fullscreenControls">
+<div class="exit-fullscreen-btn" id="btnExitFullscreen">✕</div>
+</div>
+
+<!-- 触摸提示 -->
+<div class="touch-hint hidden" id="touchHint">触摸屏幕显示控制按钮</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const webView = document.getElementById('webView');
+const toast = document.getElementById('toast');
+const inputUrl = document.getElementById('inputUrl');
+const menuArea = document.getElementById('menuArea');
+const fullscreenControls = document.getElementById('fullscreenControls');
+const touchHint = document.getElementById('touchHint');
+const exitFullscreenBtn = document.getElementById('btnExitFullscreen');
+
+let isFullscreen = false;
+let isLandscape = false;
+let touchTimeout = null;
+let controlsVisible = true;
+
+function showToast(msg) {
+    toast.textContent = msg;
+    toast.style.display = 'block';
+    setTimeout(() => toast.style.display = 'none', 2000);
+  }
+
+  function toggleCategory(category) {
+      // 获取所有功能按钮区域
+      const allButtonSections = document.querySelectorAll('[id$="Buttons"]');
+
+      // 获取当前点击的分类对应的功能区域
+      const targetSection = document.getElementById(`${category}Buttons`);
+
+      // 检查目标区域当前是否显示
+      const isTargetVisible = targetSection.style.display !== 'none';
+
+      // 先隐藏所有区域
+      allButtonSections.forEach(section => {
+        section.style.display = 'none';
+      });
+
+      // 如果目标区域原本是隐藏的，则显示它
+      if (!isTargetVisible) {
+          targetSection.style.display = 'block';
+        }
+      }
+
+      function collapseAllCategories() {
+          document.querySelectorAll('[id$="Buttons"]').forEach(el => el.style.display = 'none');
+        }
+
+        function extractUrl(text) {
+            if (!text) return null;
+              let url = text.match(/https?:\/\/[\w\-_.?%:/+=&]+/) ||
+              text.match(/www\.[\w\-_.?%:/+=&]+/) ||
+              text.match(/[\w-]+\.[\w-]+\.[\w-]+\/?[\w\-_.?%:/+=&]*/);
+              return url ? (url[0].startsWith('http') ? url[0] : 'http://' + url[0]) : null;
+            }
+
+            function copyToClipboard(text) {
+                if (!text) return showToast('没有内容可复制');
+                  navigator.clipboard.writeText(text).then(() => showToast('链接已复制')).catch(() => showToast('无法访问剪贴板'));
+                }
+
+                function openCurrentUrlInBrowser() {
+                    const url = webView.src;
+                    url && url !== 'about:blank' ? window.open(url, '_blank') : showToast('当前没有加载网页');
+                  }
+
+                  function copyCurrentUrl() {
+                      const url = webView.src;
+                      url && url !== 'about:blank' ? copyToClipboard(url) : showToast('当前没有加载网页');
+                    }
+
+                    function refreshWebView() {
+                        webView.src = webView.src;
+                        showToast('刷新中...');
+                      }
+
+                      // 全屏功能
+                      function enterFullscreen(landscape = false) {
+                          document.body.classList.add('fullscreen-mode');
+                          if (landscape) {
+                              document.body.classList.add('landscape-mode');
+                              isLandscape = true;
+                            }
+                            fullscreenControls.classList.remove('hidden');
+                            touchHint.classList.remove('hidden');
+                            isFullscreen = true;
+
+                            // 设置3秒后隐藏控制按钮
+                            resetTouchTimer();
+                          }
+
+                          function exitFullscreen() {
+                              document.body.classList.remove('fullscreen-mode', 'landscape-mode');
+                              fullscreenControls.classList.add('hidden');
+                              touchHint.classList.add('hidden');
+                              isFullscreen = false;
+                              isLandscape = false;
+
+                              // 清除触摸计时器
+                              clearTimeout(touchTimeout);
+                            }
+
+                            // 触摸控制功能
+                            function showControls() {
+                                if (!isFullscreen) return;
+
+                                  fullscreenControls.classList.remove('hidden');
+                                  touchHint.classList.remove('hidden');
+                                  controlsVisible = true;
+
+                                  // 3秒后隐藏控制按钮
+                                  resetTouchTimer();
+                                }
+
+                                function hideControls() {
+                                    if (!isFullscreen) return;
+
+                                      // 只隐藏视觉元素，但保持按钮可点击
+                                      fullscreenControls.style.opacity = '0';
+                                      touchHint.classList.add('hidden');
+                                      controlsVisible = false;
+                                    }
+
+                                    function resetTouchTimer() {
+                                        // 清除现有计时器
+                                        clearTimeout(touchTimeout);
+
+                                        // 设置新的计时器
+                                        touchTimeout = setTimeout(() => {
+                                          hideControls();
+                                        }, 3000);
+                                      }
+
+                                      // 事件监听
+                                      document.getElementById('btnCollapseAll').addEventListener('click', collapseAllCategories);
+                                      document.getElementById('btnOpenInBrowser').addEventListener('click', openCurrentUrlInBrowser);
+                                      document.getElementById('btnCopyCurrentUrl').addEventListener('click', copyCurrentUrl);
+                                      document.getElementById('btnRefresh').addEventListener('click', refreshWebView);
+
+                                      // 全屏按钮事件
+                                      document.getElementById('btnPortraitFullscreen').addEventListener('click', () => enterFullscreen(false));
+                                      document.getElementById('btnLandscapeFullscreen').addEventListener('click', () => enterFullscreen(true));
+                                      exitFullscreenBtn.addEventListener('click', exitFullscreen);
+
+                                      // 分类按钮事件委托
+                                      document.querySelectorAll('.category-button').forEach(btn => {
+                                        btn.addEventListener('click', () => toggleCategory(btn.dataset.category));
+                                      });
+
+                                      // 功能按钮事件委托
+                                      document.querySelectorAll('#videoButtons .button, #resourceButtons .button, #musicButtons .button, #searchButtons .button').forEach(btn => {
+                                        btn.addEventListener('click', function() {
+                                            const template = this.dataset.url;
+                                            if (!template) return;
+
+                                              const text = inputUrl.value.trim();
+                                              if (!text) return showToast('请输入内容');
+
+                                                const isUrlButton = this.parentElement.parentElement.id === 'videoButtons';
+                                                const url = isUrlButton ? extractUrl(text) : text;
+                                                if (!url) return showToast(isUrlButton ? '请输入有效地址' : '请输入搜索内容');
+
+                                                  webView.src = template.replace(/{url}|{text}/g, encodeURIComponent(url));
+
+                                                  // 如果是在全屏模式下，重置触摸计时器
+                                                  if (isFullscreen) {
+                                                      resetTouchTimer();
+                                                    }
+                                                  });
+                                                });
+
+                                                // 添加触摸事件监听
+                                                document.addEventListener('touchstart', (e) => {
+                                                  if (isFullscreen) {
+                                                      // 如果点击的是退出按钮区域，不显示控制按钮
+                                                      if (!e.target.closest('.fullscreen-controls')) {
+                                                          showControls();
+                                                        }
+                                                      }
+                                                    });
+
+                                                    // 添加鼠标事件监听（用于桌面设备测试）
+                                                    document.addEventListener('mousemove', () => {
+                                                      if (isFullscreen) {
+                                                          showControls();
+                                                        }
+                                                      });
+
+                                                      // 确保退出按钮始终可点击，即使隐藏了
+                                                      exitFullscreenBtn.addEventListener('mouseover', () => {
+                                                        if (isFullscreen && !controlsVisible) {
+                                                            fullscreenControls.style.opacity = '1';
+                                                          }
+                                                        });
+
+                                                        // 初始化：隐藏所有功能区域
+                                                        document.addEventListener('DOMContentLoaded', function() {
+                                                            collapseAllCategories();
+                                                          });
+                                                          </script>
+                                                          </body>
+                                                          </html>
