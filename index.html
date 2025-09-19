@@ -9,18 +9,23 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  font-family: 'Arial', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 }
 
 body {
   background: #f5f5f5;
   color: #333;
   padding: 12px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
 .container {
-  max-width: 100%;
+  max-width: 1200px;
   margin: 0 auto;
+  width: 100%;
+  flex: 1;
 }
 
 .input-field {
@@ -31,6 +36,7 @@ body {
   border-radius: 8px;
   border: 1px solid #ddd;
   font-size: 16px;
+  -webkit-appearance: none;
 }
 
 .button-row {
@@ -53,10 +59,20 @@ body {
   justify-content: center;
   cursor: pointer;
   border: 1px solid #bbdefb;
+  transition: all 0.3s ease;
+  font-size: 14px;
+  padding: 0 8px;
+}
+
+.category-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
 .category-button.active {
   background: #bbdefb;
+  transform: translateY(0);
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .category-button.recommended {
@@ -81,15 +97,20 @@ body {
   margin-bottom: 8px;
   border: 1px solid #eee;
   cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 .result-item:hover {
   background: #f5f5f5;
+  transform: translateX(5px);
 }
 
 .result-title {
   font-weight: bold;
   margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
 }
 
 .result-url {
@@ -127,22 +148,31 @@ body {
 .modal {
   display: none;
   position: fixed;
-  z-index: 1;
+  z-index: 1000;
   left: 0;
   top: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0,0,0,0.4);
+  background-color: rgba(0,0,0,0.5);
+  overflow: auto;
+  touch-action: manipulation;
 }
 
 .modal-content {
   background-color: #fefefe;
-  margin: 15% auto;
+  margin: 10% auto;
   padding: 20px;
-  border-radius: 8px;
+  border-radius: 12px;
   width: 90%;
   max-width: 600px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+  position: relative;
+  animation: modalFadeIn 0.3s;
+}
+
+@keyframes modalFadeIn {
+  from {opacity: 0; transform: translateY(-50px);}
+  to {opacity: 1; transform: translateY(0);}
 }
 
 .modal-header {
@@ -165,6 +195,7 @@ body {
   font-size: 28px;
   font-weight: bold;
   cursor: pointer;
+  line-height: 1;
 }
 
 .close-btn:hover {
@@ -174,6 +205,17 @@ body {
 .modal-body {
   margin-bottom: 15px;
   line-height: 1.6;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.modal-body ul {
+  padding-left: 20px;
+  margin: 10px 0;
+}
+
+.modal-body li {
+  margin-bottom: 5px;
 }
 
 .modal-footer {
@@ -181,26 +223,115 @@ body {
 }
 
 .confirm-btn {
-  padding: 8px 16px;
+  padding: 10px 20px;
   background-color: #1976d2;
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 6px;
   cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.2s;
 }
 
 .confirm-btn:hover {
   background-color: #1565c0;
 }
 
-@media (max-width: 600px) {
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .category-button {
+    min-width: calc(50% - 8px);
+    font-size: 13px;
+  }
+  
+  .modal-content {
+    margin: 15% auto;
+    padding: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  body {
+    padding: 8px;
+  }
+  
   .category-button {
     min-width: 100%;
   }
-
+  
   .modal-content {
-    margin: 30% auto;
+    margin: 20% auto;
     width: 95%;
+    padding: 12px;
+  }
+  
+  .modal-title {
+    font-size: 18px;
+  }
+}
+
+/* 电视和大屏幕设备 */
+@media (min-width: 1920px) {
+  body {
+    font-size: 18px;
+  }
+  
+  .container {
+    max-width: 1600px;
+  }
+  
+  .input-field {
+    height: 60px;
+    font-size: 20px;
+  }
+  
+  .category-button {
+    height: 60px;
+    font-size: 20px;
+  }
+  
+  .result-item {
+    padding: 20px;
+  }
+  
+  .result-title {
+    font-size: 22px;
+  }
+  
+  .result-url {
+    font-size: 18px;
+  }
+  
+  .type-tag {
+    font-size: 16px;
+    padding: 4px 10px;
+  }
+}
+
+/* 手表和小屏幕设备 */
+@media (max-width: 320px) {
+  .category-button {
+    font-size: 12px;
+    padding: 0 4px;
+  }
+  
+  .input-field {
+    font-size: 14px;
+    padding: 0 12px;
+  }
+}
+
+/* iOS Safari特定优化 */
+@supports (-webkit-touch-callout: none) {
+  .input-field {
+    font-size: 16px; /* 防止iOS缩放 */
+  }
+}
+
+/* 防止移动设备上的点击高亮 */
+@media (max-device-width: 1024px) {
+  .category-button, .result-item, .close-btn, .confirm-btn {
+    -webkit-tap-highlight-color: transparent;
   }
 }
 </style>
@@ -234,12 +365,12 @@ body {
 </div>
 
 <div class="container">
-<input type="text" class="input-field" id="inputUrl" placeholder="输入视频地址或搜索内容">
+<input type="text" class="input-field" id="inputUrl" placeholder="输入视频地址或搜索内容" autocomplete="off">
 <div id="inputHint" class="input-hint"></div>
 <div id="errorMessage" class="error-message"></div>
 
 <div class="button-row">
-<div class="category-button" data-category="video">视频解析</div>
+<div class="category-button active" data-category="video">视频解析</div>
 <div class="category-button" data-category="resource">资源搜索</div>
 <div class="category-button" data-category="music">音乐搜索</div>
 <div class="category-button" data-category="search">漫画搜索</div>
@@ -355,6 +486,13 @@ function init() {
 
     // 输入框事件监听
     inputUrl.addEventListener('input', checkInputType);
+    
+    // 添加键盘事件支持
+    inputUrl.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            showCategory(currentCategory);
+        }
+    });
 
     // 点击分类按钮
     categoryButtons.forEach(button => {
@@ -377,775 +515,258 @@ function init() {
               closeModal();
             }
           });
-        }
+          
+      // 添加触摸事件支持（针对移动设备）
+      document.addEventListener('touchstart', function() {}, {passive: true});
+    }
 
-        // 显示弹窗
-        function showModal() {
-            modal.style.display = 'block';
-          }
-
-          // 关闭弹窗
-          function closeModal() {
-              modal.style.display = 'none';
-            }
-
-            function checkInputType() {
-                const inputText = inputUrl.value.trim();
-
-                // 清空提示和错误
-                hideHint();
-                hideError();
-
-                if (!inputText) {
-                    inputType = null;
-                    resetButtonRecommendations();
-                    return;
-                  }
-
-                  // 检查是否为URL
-                  if (isUrl(inputText)) {
-                      inputType = 'url';
-                      showHint('检测到您输入的是链接，请使用"视频解析"或"短视频下载"功能');
-                      recommendButtons(['video', 'duanshipin']);
-                    } else {
-                      inputType = 'text';
-                      // 检查文本中是否包含疑似URL
-                      if (containsUrl(inputText)) {
-                          showHint('文本搜索不应包含链接，请删除链接或使用"视频解析"功能');
-                          recommendButtons(['video', 'duanshipin']);
-                        } else {
-                          showHint('检测到您输入的是文本，请使用搜索功能');
-                          recommendButtons(['resource', 'music', 'search']);
-                        }
-                      }
-                    }
-
-                    function showCategory(category) {
-                        // 检查输入类型与分类是否匹配
-                        if (inputType && !isCategoryMatch(category)) {
-                            showError(getMismatchError(category));
-                            return;
-                          }
-
-                          // 更新活动按钮样式
-                          categoryButtons.forEach(btn => {
-                            btn.classList.remove('active');
-                            btn.classList.remove('recommended');
-                          });
-                          document.querySelector(`.category-button[data-category="${category}"]`).classList.add('active');
-
-                          // 隐藏所有结果容器
-                          Object.values(resultsContainers).forEach(container => {
-                            container.style.display = 'none';
-                          });
-
-                          // 显示当前分类的结果容器
-                          const currentContainer = resultsContainers[category];
-                          currentContainer.style.display = 'block';
-
-                          // 处理直达站点
-                          if (category === 'direct') {
-                              displayDirectSites(currentContainer);
-                            } else {
-                              const inputText = inputUrl.value.trim();
-                              displayLinks(category, inputText);
-                            }
-
-                            // 隐藏错误信息
-                            hideError();
-                          }
-
-                          function displayDirectSites(container) {
-                              container.innerHTML = '';
-
-                              apiEndpoints.direct.forEach(site => {
-                                const item = createResultItem(site.name, site.url, 'direct');
-
-                                // 点击事件
-                                item.addEventListener('click', () => {
-                                  window.open(site.url, '_blank');
-                                });
-
-                                container.appendChild(item);
-                              });
-                            }
-
-                            function displayLinks(category, inputText) {
-                                const endpoints = apiEndpoints[category];
-                                const container = resultsContainers[category];
-
-                                // 清空容器和错误信息
-                                container.innerHTML = '';
-                                hideError();
-
-                                // 检查输入是否为空
-                                if (!inputText) {
-                                    return;
-                                  }
-
-                                  // 处理不同类型的链接
-                                  endpoints.forEach(endpoint => {
-                                    let finalUrl = endpoint.url;
-
-                                    if (endpoint.url.includes('{url}')) {
-                                        // URL解析类型
-                                        const extractedUrl = extractUrl(inputText);
-                                        if (!extractedUrl) {
-                                            const item = createResultItem(endpoint.name, endpoint.url, 'url');
-                                            container.appendChild(item);
-                                            return;
-                                          }
-                                          finalUrl = endpoint.url.replace(/{url}/g, encodeURIComponent(extractedUrl));
-                                        } else if (endpoint.url.includes('{text}')) {
-                                            // 文本搜索类型
-                                            finalUrl = endpoint.url.replace(/{text}/g, encodeURIComponent(inputText));
-                                          }
-
-                                          // 创建结果项
-                                          const item = createResultItem(endpoint.name, finalUrl, category);
-
-                                          // 点击事件
-                                          item.addEventListener('click', () => {
-                                            window.open(finalUrl, '_blank');
-                                          });
-
-                                          container.appendChild(item);
-                                        });
-                                      }
-
-                                      function createResultItem(name, url, type) {
-                                          const item = document.createElement('div');
-                                          item.className = 'result-item';
-
-                                          const title = document.createElement('div');
-                                          title.className = 'result-title';
-                                          title.textContent = name;
-
-                                          // 修复后的标签类型判断逻辑
-                                          const typeTag = document.createElement('span');
-                                          typeTag.className = 'type-tag';
-
-                                          // 根据分类类型设置标签
-                                          if (type === 'direct') {
-                                              typeTag.textContent = '直达站点';
-                                            } else if (type === 'video' || type === 'duanshipin') {
-                                                typeTag.textContent = 'URL解析';
-                                              } else {
-                                                typeTag.textContent = '文本搜索';
-                                              }
-
-                                              title.appendChild(typeTag);
-
-                                              const urlElement = document.createElement('div');
-                                              urlElement.className = 'result-url';
-                                              urlElement.textContent = url;
-
-                                              item.appendChild(title);
-                                              item.appendChild(urlElement);
-
-                                              return item;
-                                            }
-
-                                            // 检查是否为URL
-                                            function isUrl(text) {
-                                                return extractUrl(text) !== null;
-                                              }
-
-                                              // 检查文本中是否包含URL
-                                              function containsUrl(text) {
-                                                  const urlPattern = /(https?:\/\/|www\.)[^\s]+/;
-                                                  return urlPattern.test(text);
-                                                }
-
-                                                // 从文本中提取URL
-                                                function extractUrl(text) {
-                                                    if (!text) return null;
-                                                      const urlMatch = text.match(/(https?:\/\/[^\s]+)|(www\.[^\s]+)|([^\s]+\.[^\s]+\.[^\s]+)/);
-                                                      return urlMatch ? (urlMatch[0].startsWith('http') ? urlMatch[0] : 'http://' + urlMatch[0]) : null;
-                                                    }
-
-                                                    // 检查分类是否匹配输入类型
-                                                    function isCategoryMatch(category) {
-                                                        if (category === 'direct') return true;
-                                                          if (inputType === 'url') return category === 'video' || category === 'duanshipin';
-                                                            if (inputType === 'text') return ['resource', 'music', 'search'].includes(category);
-                                                              return true;
-                                                            }
-
-                                                            // 获取不匹配错误信息
-                                                            function getMismatchError(category) {
-                                                                if (inputType === 'url') {
-                                                                    return '您输入的是链接，请使用"视频解析"或"短视频下载"功能';
-                                                                  } else {
-                                                                    return '您输入的是文本，请使用搜索功能（资源搜索/音乐搜索/漫画搜索）';
-                                                                  }
-                                                                }
-
-                                                                // 推荐按钮
-                                                                function recommendButtons(categories) {
-                                                                    resetButtonRecommendations();
-                                                                    categories.forEach(category => {
-                                                                      document.querySelector(`.category-button[data-category="${category}"]`).classList.add('recommended');
-                                                                    });
-                                                                  }
-
-                                                                  function resetButtonRecommendations() {
-                                                                      categoryButtons.forEach(btn => btn.classList.remove('recommended'));
-                                                                    }
-
-                                                                    // 显示提示信息
-                                                                    function showHint(message) {
-                                                                        inputHint.textContent = message;
-                                                                        inputHint.style.display = 'block';
-                                                                      }
-
-                                                                      // 隐藏提示信息
-                                                                      function hideHint() {
-                                                                          inputHint.style.display = 'none';
-                                                                        }
-
-                                                                        // 显示错误信息
-                                                                        function showError(message) {
-                                                                            errorMessage.textContent = message;
-                                                                            errorMessage.style.display = 'block';
-                                                                          }
-
-                                                                          // 隐藏错误信息
-                                                                          function hideError() {
-                                                                              errorMessage.style.display = 'none';
-                                                                            }
-                                                                            </script>
-                                                                            </body>
-                                                                            </html>}
-
-.result-title {
-  font-weight: bold;
-  margin-bottom: 4px;
-}
-
-.result-url {
-  color: #666;
-  font-size: 14px;
-  word-break: break-all;
-}
-
-.type-tag {
-  display: inline-block;
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-size: 12px;
-  margin-left: 8px;
-  background: #2196f3;
-  color: white;
-}
-
-.error-message {
-  color: #f44336;
-  margin: 8px 0;
-  text-align: center;
-  display: none;
-}
-
-.input-hint {
-  color: #666;
-  font-size: 14px;
-  margin: -12px 0 12px;
-  padding: 0 16px;
-  display: none;
-}
-
-/* 弹窗样式 */
-.modal {
-  display: none;
-  position: fixed;
-  z-index: 1;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0,0,0,0.4);
-}
-
-.modal-content {
-  background-color: #fefefe;
-  margin: 15% auto;
-  padding: 20px;
-  border-radius: 8px;
-  width: 90%;
-  max-width: 600px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-}
-
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 15px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid #eee;
-}
-
-.modal-title {
-  font-size: 20px;
-  font-weight: bold;
-  color: #1976d2;
-}
-
-.close-btn {
-  color: #aaa;
-  font-size: 28px;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-.close-btn:hover {
-  color: #333;
-}
-
-.modal-body {
-  margin-bottom: 15px;
-  line-height: 1.6;
-}
-
-.modal-footer {
-  text-align: right;
-}
-
-.confirm-btn {
-  padding: 8px 16px;
-  background-color: #1976d2;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.confirm-btn:hover {
-  background-color: #1565c0;
-}
-
-@media (max-width: 600px) {
-  .category-button {
-    min-width: 100%;
-  }
-
-  .modal-content {
-    margin: 30% auto;
-    width: 95%;
-  }
-}
-</style>
-</head>
-<body>
-<!-- 弹窗 -->
-<div id="welcomeModal" class="modal">
-<div class="modal-content">
-<div class="modal-header">
-<span class="modal-title">PLAYER多功能工具声明</span>
-<span class="close-btn">&times;</span>
-</div>
-<div class="modal-body">
-<p><strong>欢迎使用PLAYER多功能工具！</strong></p>
-<p>本工具提供视频解析、资源搜索、音乐搜索、漫画搜索和直达站点等功能，旨在为用户提供便捷的多媒体资源访问体验。</p>
-<p><strong>使用说明：</strong></p>
-<ul>
-<li>输入视频链接可使用"视频解析"功能</li>
-<li>输入关键词可使用各类搜索功能</li>
-<li>"直达站点"可直接访问常用资源网站</li>
-</ul>
-<p><strong>免责声明：</strong></p>
-<p>本工具仅提供第三方网站链接，不存储任何资源内容。使用本工具即表示您同意自行承担使用风险，请遵守相关法律法规。</p>
-<p>部分功能可能因网站变更而失效，我们会定期更新维护。</p>
-<p>QQ交流群：636959122</p>
-</div>
-<div class="modal-footer">
-<button class="confirm-btn">我明白了</button>
-</div>
-</div>
-</div>
-
-<div class="container">
-<input type="text" class="input-field" id="inputUrl" placeholder="输入视频地址或搜索内容">
-<div id="inputHint" class="input-hint"></div>
-<div id="errorMessage" class="error-message"></div>
-
-<div class="button-row">
-<div class="category-button" data-category="video">视频解析</div>
-<div class="category-button" data-category="resource">资源搜索</div>
-<div class="category-button" data-category="music">音乐搜索</div>
-<div class="category-button" data-category="search">漫画搜索</div>
-<div class="category-button" data-category="duanshipin">短视频下载</div>
-<div class="category-button" data-category="direct">直达站点</div>
-</div>
-
-<div id="videoResults" class="results-container"></div>
-<div id="resourceResults" class="results-container"></div>
-<div id="musicResults" class="results-container"></div>
-<div id="searchResults" class="results-container"></div>
-<div id="duanshipinResults" class="results-container"></div>
-<div id="directResults" class="results-container"></div>
-</div>
-
-<script>
-const inputUrl = document.getElementById('inputUrl');
-const inputHint = document.getElementById('inputHint');
-const errorMessage = document.getElementById('errorMessage');
-const categoryButtons = document.querySelectorAll('.category-button');
-const resultsContainers = {
-  video: document.getElementById('videoResults'),
-  resource: document.getElementById('resourceResults'),
-  music: document.getElementById('musicResults'),
-  search: document.getElementById('searchResults'),
-  duanshipin: document.getElementById('duanshipinResults'),
-  direct: document.getElementById('directResults')
-};
-
-// 弹窗元素
-const modal = document.getElementById('welcomeModal');
-const closeBtn = document.querySelector('.close-btn');
-const confirmBtn = document.querySelector('.confirm-btn');
-
-let currentCategory = 'video';
-let inputType = null; // 'url' 或 'text'
-
-// 定义各分类的解析接口
-const apiEndpoints = {
-  video: [
-  { name: '播放一', url: 'https://www.yemu.xyz/v/d.php?url={url}' },
-  { name: '播放二', url: 'https://jx.xmflv.cc/?url={url}' },
-  { name: '播放三', url: 'https://player.bingdou.vip/?url={url}' },
-  { name: '播放四', url: 'https://www.yemu.xyz/?url={url}' },
-  { name: '播放五', url: 'http://111.6.188.162/bbqq.php?url={url}' },
-  { name: '播放六', url: 'https://bd.jx.cn/?url={url}' },
-  { name: '播放七', url: 'https://www.pouyun.com/?url={url}' },
-  { name: '播放八', url: 'https://jx.2s0.cn/player/?url={url}' },
-  { name: '播放九', url: 'https://jx.2s0.cn/player/analysis.php?v={url}' },
-  { name: '播放十', url: 'https://jx.nnxv.cn/tv.php?url={url}' },
-  { name: '超强解析', url: 'https://jx.playerjy.com/?url={url}' }
-  ],
-  resource: [
-  { name: '名字搜一', url: 'https://z1.im1907.top/?jx={text}' },
-  { name: '名字搜二', url: 'http://v9j.net/so.php?wd={text}' },
-  { name: '名字搜三', url: 'https://xunlei8.me/s/{text}.html' },
-  { name: '名字搜四', url: 'https://www.bt-tt.com/search/{text}' },
-  { name: '名字搜五', url: 'https://moduzy.net/api.php/provide/vod/?ac=detail&wd={text}&pg=1' },
-  { name: '视频资源一', url: 'http://yinghuadm.cn/search_-------------.html?wd={text}' },
-  { name: '视频资源二', url: 'https://sszzyy.com/index.php/vod/search.html?wd={text}' },
-  { name: '视频资源三', url: 'https://www.ylys.tv/vodsearch/-------------/wd/{text}' },
-  { name: '视频资源四', url: 'https://www.czzymovie.com/xsss1O1?q={text}' },
-  { name: '视频资源五', url: 'http://660f.com/vodsearch/-------------.html?wd={text}' },
-  { name: '视频资源六', url: 'https://www.wwgz.cn/index.php?m=vod-search&wd={text}' }
-  ],
-  music: [
-  { name: '音乐一', url: 'https://www.1mp3.top/?key={text}&search=1' },
-  { name: '音乐二', url: 'https://www.gequhai.com/s/{text}' },
-  { name: '音乐三', url: 'https://pjmp3.com/search.php?keyword={text}' },
-  { name: '音乐四', url: 'https://www.gequbao.com/s/{text}' },
-  { name: '音乐五', url: 'https://www.flmp3.pro/search.html?keyword={text}' },
-  { name: '音乐资源一', url: 'https://yym4.com/search/{text}' },
-  { name: '音乐资源二', url: 'https://www.5song.xyz/search.html?keyword={text}' }
-  ],
-  search: [
-  { name: '漫画一', url: 'https://www.mhw1.com/search?key={text}' },
-  { name: '漫画二', url: 'https://www.gfmh.app/index.php/search?key={text}' },
-  { name: '漫画三', url: 'https://www.colamanga.com/search?type=1&searchString={text}' },
-  { name: '漫画四', url: 'http://m.bengou.co/statics/search.aspx?key={text}' },
-  { name: '漫画五', url: 'https://godamh.com/s/{text}' },
-  { name: '漫画六', url: 'https://cn.baozimhcn.com/search?q={text}' }
-  ],
-  duanshipin: [
-  { name: '短视频下载', url: 'http://47.99.158.118/video-crack/v2/parsecontent?url={url}' }
-  ],
-  direct: [
-  { name: '小游戏一', url: 'https://www.yikm.net/nes?page=1&tag=&e=2' },
-  { name: '小游戏二', url: 'https://dos.lol/' },
-  { name: '小游戏三', url: 'https://zaixianwan.app/' },
-  { name: '小游戏四', url: 'https://zh.y8.com/' },
-  { name: '小游戏五', url: 'https://www.crazygames.com/' },
-  { name: '小游戏六', url: 'https://poki.com/zh' },
-  { name: '短视频下载一', url: 'https://www.v2ob.com/douyin' },
-  { name: '影视一', url: 'https://www.ynqihan.com/' },
-  { name: '影视二', url: 'https://haifengyi.com/' },
-  { name: '影视三', url: 'https://www.puromotors.com/' },
-  { name: '随机音乐一', url: 'https://music.mcya.cn/' },
-  { name: '随机音乐二', url: 'https://netease-music.fe-mm.com/#/music/playlist' },
-  { name: '音源一', url: 'https://mu-jie.cc/musicBox/?src=www.jspoo.com#/' },
-  { name: '音源二', url: 'https://www.buguyy.top/' },
-  { name: '音源三', url: 'https://www.qqmp3.vip/' },
-  { name: '音源四', url: 'https://suapi.net/tool/music' },
-  { name: '音源五', url: 'https://tools.liumingye.cn/music/' },
-  { name: '漫源一', url: 'http://rumanhua1.com/?src=www.jspoo.com' }
-  ]
-};
-
-// 初始化
-init();
-
-function init() {
     // 显示弹窗
-    showModal();
+    function showModal() {
+        modal.style.display = 'block';
+        // 存储已显示弹窗的状态
+        localStorage.setItem('playerToolModalShown', 'true');
+      }
 
-    // 输入框事件监听
-    inputUrl.addEventListener('input', checkInputType);
-
-    // 点击分类按钮
-    categoryButtons.forEach(button => {
-      button.addEventListener('click', function() {
-          currentCategory = this.dataset.category;
-          showCategory(currentCategory);
-        });
-      });
-
-      // 默认显示第一个分类
-      showCategory('video');
-
-      // 弹窗关闭事件
-      closeBtn.addEventListener('click', closeModal);
-      confirmBtn.addEventListener('click', closeModal);
-
-      // 点击弹窗外部关闭
-      window.addEventListener('click', function(event) {
-          if (event.target === modal) {
-              closeModal();
-            }
-          });
+      // 关闭弹窗
+      function closeModal() {
+          modal.style.display = 'none';
         }
 
-        // 显示弹窗
-        function showModal() {
-            modal.style.display = 'block';
-          }
+        function checkInputType() {
+            const inputText = inputUrl.value.trim();
 
-          // 关闭弹窗
-          function closeModal() {
-              modal.style.display = 'none';
-            }
+            // 清空提示和错误
+            hideHint();
+            hideError();
 
-            function checkInputType() {
-                const inputText = inputUrl.value.trim();
+            if (!inputText) {
+                inputType = null;
+                resetButtonRecommendations();
+                return;
+              }
 
-                // 清空提示和错误
-                hideHint();
-                hideError();
-
-                if (!inputText) {
-                    inputType = null;
-                    resetButtonRecommendations();
-                    return;
-                  }
-
-                  // 检查是否为URL
-                  if (isUrl(inputText)) {
-                      inputType = 'url';
-                      showHint('检测到您输入的是链接，请使用"视频解析"或"短视频下载"功能');
+              // 检查是否为URL
+              if (isUrl(inputText)) {
+                  inputType = 'url';
+                  showHint('检测到您输入的是链接，请使用"视频解析"或"短视频下载"功能');
+                  recommendButtons(['video', 'duanshipin']);
+                } else {
+                  inputType = 'text';
+                  // 检查文本中是否包含疑似URL
+                  if (containsUrl(inputText)) {
+                      showHint('文本搜索不应包含链接，请删除链接或使用"视频解析"功能');
                       recommendButtons(['video', 'duanshipin']);
                     } else {
-                      inputType = 'text';
-                      // 检查文本中是否包含疑似URL
-                      if (containsUrl(inputText)) {
-                          showHint('文本搜索不应包含链接，请删除链接或使用"视频解析"功能');
-                          recommendButtons(['video', 'duanshipin']);
-                        } else {
-                          showHint('检测到您输入的是文本，请使用搜索功能');
-                          recommendButtons(['resource', 'music', 'search']);
-                        }
-                      }
+                      showHint('检测到您输入的是文本，请使用搜索功能');
+                      recommendButtons(['resource', 'music', 'search']);
                     }
+                  }
+                }
 
-                    function showCategory(category) {
-                        // 检查输入类型与分类是否匹配
-                        if (inputType && !isCategoryMatch(category)) {
-                            showError(getMismatchError(category));
-                            return;
-                          }
+                function showCategory(category) {
+                    // 检查输入类型与分类是否匹配
+                    if (inputType && !isCategoryMatch(category)) {
+                        showError(getMismatchError(category));
+                        return;
+                      }
 
-                          // 更新活动按钮样式
-                          categoryButtons.forEach(btn => {
-                            btn.classList.remove('active');
-                            btn.classList.remove('recommended');
+                      // 更新活动按钮样式
+                      categoryButtons.forEach(btn => {
+                        btn.classList.remove('active');
+                        btn.classList.remove('recommended');
+                      });
+                      document.querySelector(`.category-button[data-category="${category}"]`).classList.add('active');
+
+                      // 隐藏所有结果容器
+                      Object.values(resultsContainers).forEach(container => {
+                        container.style.display = 'none';
+                      });
+
+                      // 显示当前分类的结果容器
+                      const currentContainer = resultsContainers[category];
+                      currentContainer.style.display = 'block';
+
+                      // 处理直达站点
+                      if (category === 'direct') {
+                          displayDirectSites(currentContainer);
+                        } else {
+                          const inputText = inputUrl.value.trim();
+                          displayLinks(category, inputText);
+                        }
+
+                        // 隐藏错误信息
+                        hideError();
+                      }
+
+                      function displayDirectSites(container) {
+                          container.innerHTML = '';
+
+                          apiEndpoints.direct.forEach(site => {
+                            const item = createResultItem(site.name, site.url, 'direct');
+
+                            // 点击事件
+                            item.addEventListener('click', () => {
+                              window.open(site.url, '_blank');
+                            });
+                            
+                            // 添加触摸事件支持
+                            item.addEventListener('touchstart', () => {
+                              window.open(site.url, '_blank');
+                            }, {passive: true});
+
+                            container.appendChild(item);
                           });
-                          document.querySelector(`.category-button[data-category="${category}"]`).classList.add('active');
+                        }
 
-                          // 隐藏所有结果容器
-                          Object.values(resultsContainers).forEach(container => {
-                            container.style.display = 'none';
-                          });
+                        function displayLinks(category, inputText) {
+                            const endpoints = apiEndpoints[category];
+                            const container = resultsContainers[category];
 
-                          // 显示当前分类的结果容器
-                          const currentContainer = resultsContainers[category];
-                          currentContainer.style.display = 'block';
-
-                          // 处理直达站点
-                          if (category === 'direct') {
-                              displayDirectSites(currentContainer);
-                            } else {
-                              const inputText = inputUrl.value.trim();
-                              displayLinks(category, inputText);
-                            }
-
-                            // 隐藏错误信息
+                            // 清空容器和错误信息
+                            container.innerHTML = '';
                             hideError();
-                          }
 
-                          function displayDirectSites(container) {
-                              container.innerHTML = '';
+                            // 检查输入是否为空
+                            if (!inputText) {
+                                return;
+                              }
 
-                              apiEndpoints.direct.forEach(site => {
-                                const item = createResultItem(site.name, site.url, 'direct');
+                              // 处理不同类型的链接
+                              endpoints.forEach(endpoint => {
+                                let finalUrl = endpoint.url;
 
-                                // 点击事件
-                                item.addEventListener('click', () => {
-                                  window.open(site.url, '_blank');
-                                });
-
-                                container.appendChild(item);
-                              });
-                            }
-
-                            function displayLinks(category, inputText) {
-                                const endpoints = apiEndpoints[category];
-                                const container = resultsContainers[category];
-
-                                // 清空容器和错误信息
-                                container.innerHTML = '';
-                                hideError();
-
-                                // 检查输入是否为空
-                                if (!inputText) {
-                                    return;
-                                  }
-
-                                  // 处理不同类型的链接
-                                  endpoints.forEach(endpoint => {
-                                    let finalUrl = endpoint.url;
-
-                                    if (endpoint.url.includes('{url}')) {
-                                        // URL解析类型
-                                        const extractedUrl = extractUrl(inputText);
-                                        if (!extractedUrl) {
-                                            const item = createResultItem(endpoint.name, endpoint.url, 'url');
-                                            container.appendChild(item);
-                                            return;
-                                          }
-                                          finalUrl = endpoint.url.replace(/{url}/g, encodeURIComponent(extractedUrl));
-                                        } else if (endpoint.url.includes('{text}')) {
-                                            // 文本搜索类型
-                                            finalUrl = endpoint.url.replace(/{text}/g, encodeURIComponent(inputText));
-                                          }
-
-                                          // 创建结果项
-                                          const item = createResultItem(endpoint.name, finalUrl, category);
-
-                                          // 点击事件
-                                          item.addEventListener('click', () => {
-                                            window.open(finalUrl, '_blank');
-                                          });
-
-                                          container.appendChild(item);
-                                        });
+                                if (endpoint.url.includes('{url}')) {
+                                    // URL解析类型
+                                    const extractedUrl = extractUrl(inputText);
+                                    if (!extractedUrl) {
+                                        const item = createResultItem(endpoint.name, endpoint.url, 'url');
+                                        container.appendChild(item);
+                                        return;
+                                      }
+                                      finalUrl = endpoint.url.replace(/{url}/g, encodeURIComponent(extractedUrl));
+                                    } else if (endpoint.url.includes('{text}')) {
+                                        // 文本搜索类型
+                                        finalUrl = endpoint.url.replace(/{text}/g, encodeURIComponent(inputText));
                                       }
 
-                                      function createResultItem(name, url, type) {
-                                          const item = document.createElement('div');
-                                          item.className = 'result-item';
+                                      // 创建结果项
+                                      const item = createResultItem(endpoint.name, finalUrl, category);
 
-                                          const title = document.createElement('div');
-                                          title.className = 'result-title';
-                                          title.textContent = name;
+                                      // 点击事件
+                                      item.addEventListener('click', () => {
+                                        window.open(finalUrl, '_blank');
+                                      });
+                                      
+                                      // 添加触摸事件支持
+                                      item.addEventListener('touchstart', () => {
+                                        window.open(finalUrl, '_blank');
+                                      }, {passive: true});
 
-                                          // 修复后的标签类型判断逻辑
-                                          const typeTag = document.createElement('span');
-                                          typeTag.className = 'type-tag';
+                                      container.appendChild(item);
+                                    });
+                                  }
 
-                                          // 根据分类类型设置标签
-                                          if (type === 'direct') {
-                                              typeTag.textContent = '直达站点';
-                                            } else if (type === 'video' || type === 'duanshipin') {
-                                                typeTag.textContent = 'URL解析';
-                                              } else {
-                                                typeTag.textContent = '文本搜索';
-                                              }
+                                  function createResultItem(name, url, type) {
+                                      const item = document.createElement('div');
+                                      item.className = 'result-item';
 
-                                              title.appendChild(typeTag);
+                                      const title = document.createElement('div');
+                                      title.className = 'result-title';
+                                      title.textContent = name;
 
-                                              const urlElement = document.createElement('div');
-                                              urlElement.className = 'result-url';
-                                              urlElement.textContent = url;
+                                      // 修复后的标签类型判断逻辑
+                                      const typeTag = document.createElement('span');
+                                      typeTag.className = 'type-tag';
 
-                                              item.appendChild(title);
-                                              item.appendChild(urlElement);
+                                      // 根据分类类型设置标签
+                                      if (type === 'direct') {
+                                          typeTag.textContent = '直达站点';
+                                        } else if (type === 'video' || type === 'duanshipin') {
+                                            typeTag.textContent = 'URL解析';
+                                          } else {
+                                            typeTag.textContent = '文本搜索';
+                                          }
 
-                                              return item;
+                                          title.appendChild(typeTag);
+
+                                          const urlElement = document.createElement('div');
+                                          urlElement.className = 'result-url';
+                                          urlElement.textContent = url;
+
+                                          item.appendChild(title);
+                                          item.appendChild(urlElement);
+
+                                          return item;
+                                        }
+
+                                        // 检查是否为URL
+                                        function isUrl(text) {
+                                            return extractUrl(text) !== null;
+                                          }
+
+                                          // 检查文本中是否包含URL
+                                          function containsUrl(text) {
+                                              const urlPattern = /(https?:\/\/|www\.)[^\s]+/;
+                                              return urlPattern.test(text);
                                             }
 
-                                            // 检查是否为URL
-                                            function isUrl(text) {
-                                                return extractUrl(text) !== null;
-                                              }
-
-                                              // 检查文本中是否包含URL
-                                              function containsUrl(text) {
-                                                  const urlPattern = /(https?:\/\/|www\.)[^\s]+/;
-                                                  return urlPattern.test(text);
+                                            // 从文本中提取URL
+                                            function extractUrl(text) {
+                                                if (!text) return null;
+                                                  const urlMatch = text.match(/(https?:\/\/[^\s]+)|(www\.[^\s]+)|([^\s]+\.[^\s]+\.[^\s]+)/);
+                                                  return urlMatch ? (urlMatch[0].startsWith('http') ? urlMatch[0] : 'http://' + urlMatch[0]) : null;
                                                 }
 
-                                                // 从文本中提取URL
-                                                function extractUrl(text) {
-                                                    if (!text) return null;
-                                                      const urlMatch = text.match(/(https?:\/\/[^\s]+)|(www\.[^\s]+)|([^\s]+\.[^\s]+\.[^\s]+)/);
-                                                      return urlMatch ? (urlMatch[0].startsWith('http') ? urlMatch[0] : 'http://' + urlMatch[0]) : null;
-                                                    }
+                                                // 检查分类是否匹配输入类型
+                                                function isCategoryMatch(category) {
+                                                    if (category === 'direct') return true;
+                                                      if (inputType === 'url') return category === 'video' || category === 'duanshipin';
+                                                        if (inputType === 'text') return ['resource', 'music', 'search'].includes(category);
+                                                          return true;
+                                                        }
 
-                                                    // 检查分类是否匹配输入类型
-                                                    function isCategoryMatch(category) {
-                                                        if (category === 'direct') return true;
-                                                          if (inputType === 'url') return category === 'video' || category === 'duanshipin';
-                                                            if (inputType === 'text') return ['resource', 'music', 'search'].includes(category);
-                                                              return true;
+                                                        // 获取不匹配错误信息
+                                                        function getMismatchError(category) {
+                                                            if (inputType === 'url') {
+                                                                return '您输入的是链接，请使用"视频解析"或"短视频下载"功能';
+                                                              } else {
+                                                                return '您输入的是文本，请使用搜索功能（资源搜索/音乐搜索/漫画搜索）';
+                                                              }
                                                             }
 
-                                                            // 获取不匹配错误信息
-                                                            function getMismatchError(category) {
-                                                                if (inputType === 'url') {
-                                                                    return '您输入的是链接，请使用"视频解析"或"短视频下载"功能';
-                                                                  } else {
-                                                                    return '您输入的是文本，请使用搜索功能（资源搜索/音乐搜索/漫画搜索）';
-                                                                  }
+                                                            // 推荐按钮
+                                                            function recommendButtons(categories) {
+                                                                resetButtonRecommendations();
+                                                                categories.forEach(category => {
+                                                                  document.querySelector(`.category-button[data-category="${category}"]`).classList.add('recommended');
+                                                                });
+                                                              }
+
+                                                              function resetButtonRecommendations() {
+                                                                  categoryButtons.forEach(btn => btn.classList.remove('recommended'));
                                                                 }
 
-                                                                // 推荐按钮
-                                                                function recommendButtons(categories) {
-                                                                    resetButtonRecommendations();
-                                                                    categories.forEach(category => {
-                                                                      document.querySelector(`.category-button[data-category="${category}"]`).classList.add('recommended');
-                                                                    });
+                                                                // 显示提示信息
+                                                                function showHint(message) {
+                                                                    inputHint.textContent = message;
+                                                                    inputHint.style.display = 'block';
                                                                   }
 
-                                                                  function resetButtonRecommendations() {
-                                                                      categoryButtons.forEach(btn => btn.classList.remove('recommended'));
+                                                                  // 隐藏提示信息
+                                                                  function hideHint() {
+                                                                      inputHint.style.display = 'none';
                                                                     }
 
-                                                                    // 显示提示信息
-                                                                    function showHint(message) {
-                                                                        inputHint.textContent = message;
-                                                                        inputHint.style.display = 'block';
+                                                                    // 显示错误信息
+                                                                    function showError(message) {
+                                                                        errorMessage.textContent = message;
+                                                                        errorMessage.style.display = 'block';
                                                                       }
 
-                                                                      // 隐藏提示信息
-                                                                      function hideHint() {
-                                                                          inputHint.style.display = 'none';
+                                                                      // 隐藏错误信息
+                                                                      function hideError() {
+                                                                          errorMessage.style.display = 'none';
                                                                         }
-
-                                                                        // 显示错误信息
-                                                                        function showError(message) {
-                                                                            errorMessage.textContent = message;
-                                                                            errorMessage.style.display = 'block';
-                                                                          }
-
-                                                                          // 隐藏错误信息
-                                                                          function hideError() {
-                                                                              errorMessage.style.display = 'none';
-                                                                            }
-                                                                            </script>
-                                                                            </body>
-                                                                            </html>
+                                                                        </script>
+                                                                        </body>
+                                                                        </html>
