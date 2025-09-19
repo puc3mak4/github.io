@@ -396,7 +396,6 @@ body {
 <div class="category-button" data-category="resource">资源搜索</div>
 <div class="category-button" data-category="music">音乐搜索</div>
 <div class="category-button" data-category="search">漫画搜索</div>
-<div class="category-button" data-category="duanshipin">短视频下载</div>
 <div class="category-button" data-category="direct">直达站点</div>
 </div>
 
@@ -404,7 +403,6 @@ body {
 <div id="resourceResults" class="results-container"></div>
 <div id="musicResults" class="results-container"></div>
 <div id="searchResults" class="results-container"></div>
-<div id="duanshipinResults" class="results-container"></div>
 <div id="directResults" class="results-container"></div>
 </div>
 
@@ -418,7 +416,6 @@ const resultsContainers = {
   resource: document.getElementById('resourceResults'),
   music: document.getElementById('musicResults'),
   search: document.getElementById('searchResults'),
-  duanshipin: document.getElementById('duanshipinResults'),
   direct: document.getElementById('directResults')
 };
 
@@ -473,9 +470,6 @@ const apiEndpoints = {
   { name: '漫画四', url: 'http://m.bengou.co/statics/search.aspx?key={text}' },
   { name: '漫画五', url: 'https://godamh.com/s/{text}' },
   { name: '漫画六', url: 'https://cn.baozimhcn.com/search?q={text}' }
-  ],
-  duanshipin: [
-  { name: '短视频下载', url: 'http://47.99.158.118/video-crack/v2/parsecontent?url={url}' }
   ],
   direct: [
   { name: '小游戏一', url: 'https://www.yikm.net/nes?page=1&tag=&e=2' },
@@ -567,14 +561,14 @@ function init() {
               // 检查是否为URL
               if (isUrl(inputText)) {
                   inputType = 'url';
-                  showHint('检测到您输入的是链接，请使用"视频解析"或"短视频下载"功能');
-                  recommendButtons(['video', 'duanshipin']);
+                  showHint('检测到您输入的是链接，请使用"视频解析"功能');
+                  recommendButtons(['video']);
                 } else {
                   inputType = 'text';
                   // 检查文本中是否包含疑似URL
                   if (containsUrl(inputText)) {
                       showHint('文本搜索不应包含链接，请删除链接或使用"视频解析"功能');
-                      recommendButtons(['video', 'duanshipin']);
+                      recommendButtons(['video']);
                     } else {
                       showHint('检测到您输入的是文本，请使用搜索功能');
                       recommendButtons(['resource', 'music', 'search']);
@@ -692,7 +686,7 @@ function init() {
                                       // 根据分类类型设置标签
                                       if (type === 'direct') {
                                           typeTag.textContent = '直达站点';
-                                        } else if (type === 'video' || type === 'duanshipin') {
+                                        } else if (type === 'video') {
                                             typeTag.textContent = 'URL解析';
                                           } else {
                                             typeTag.textContent = '文本搜索';
@@ -769,7 +763,7 @@ function init() {
                                                 // 检查分类是否匹配输入类型
                                                 function isCategoryMatch(category) {
                                                     if (category === 'direct') return true;
-                                                      if (inputType === 'url') return category === 'video' || category === 'duanshipin';
+                                                      if (inputType === 'url') return category === 'video';
                                                         if (inputType === 'text') return ['resource', 'music', 'search'].includes(category);
                                                           return true;
                                                         }
@@ -777,7 +771,7 @@ function init() {
                                                         // 获取不匹配错误信息
                                                         function getMismatchError(category) {
                                                             if (inputType === 'url') {
-                                                                return '您输入的是链接，请使用"视频解析"或"短视频下载"功能';
+                                                                return '您输入的是链接，请使用"视频解析"功能';
                                                               } else {
                                                                 return '您输入的是文本，请使用搜索功能（资源搜索/音乐搜索/漫画搜索）';
                                                               }
@@ -818,4 +812,4 @@ function init() {
                                                                         }
                                                                         </script>
                                                                         </body>
-                                                                        </html>
+</html>
