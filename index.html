@@ -1,815 +1,396 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PLAYER多功能工具</title>
-<style>
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-}
-
-body {
-  background: #f5f5f5;
-  color: #333;
-  padding: 12px;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
-
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  width: 100%;
-  flex: 1;
-}
-
-.input-field {
-  width: 100%;
-  height: 44px;
-  margin: 8px 0 16px;
-  padding: 0 16px;
-  border-radius: 8px;
-  border: 1px solid #ddd;
-  font-size: 16px;
-  -webkit-appearance: none;
-}
-
-.button-row {
-  display: flex;
-  flex-wrap: wrap;
-  margin: 8px 0;
-  gap: 8px;
-}
-
-.category-button {
-  flex: 1;
-  min-width: 120px;
-  height: 40px;
-  border-radius: 8px;
-  background: #e3f2fd;
-  color: #1976d2;
-  font-weight: bold;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  border: 1px solid #bbdefb;
-  transition: all 0.3s ease;
-  font-size: 14px;
-  padding: 0 8px;
-}
-
-.category-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-}
-
-.category-button.active {
-  background: #bbdefb;
-  transform: translateY(0);
-  box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.category-button.recommended {
-  animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-  0% { box-shadow: 0 0 0 0 rgba(25, 118, 210, 0.4); }
-  70% { box-shadow: 0 0 0 10px rgba(25, 118, 210, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(25, 118, 210, 0); }
-}
-
-.results-container {
-  margin-top: 16px;
-  display: none;
-}
-
-.result-item {
-  background: white;
-  border-radius: 8px;
-  padding: 12px;
-  margin-bottom: 8px;
-  border: 1px solid #eee;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  position: relative;
-}
-
-.result-item:hover {
-  background: #f5f5f5;
-  transform: translateX(5px);
-}
-
-.result-title {
-  font-weight: bold;
-  margin-bottom: 4px;
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-}
-
-.result-url {
-  color: #666;
-  font-size: 14px;
-  word-break: break-all;
-}
-
-.type-tag {
-  display: inline-block;
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-size: 12px;
-  margin-left: 8px;
-  background: #2196f3;
-  color: white;
-}
-
-.error-message {
-  color: #f44336;
-  margin: 8px 0;
-  text-align: center;
-  display: none;
-}
-
-.input-hint {
-  color: #666;
-  font-size: 14px;
-  margin: -12px 0 12px;
-  padding: 0 16px;
-  display: none;
-}
-
-.double-click-hint {
-  position: absolute;
-  right: 12px;
-  top: 12px;
-  font-size: 12px;
-  color: #999;
-  background: #f0f0f0;
-  padding: 2px 6px;
-  border-radius: 4px;
-  display: none;
-}
-
-/* 弹窗样式 */
-.modal {
-  display: none;
-  position: fixed;
-  z-index: 1000;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0,0,0,0.5);
-  overflow: auto;
-  touch-action: manipulation;
-}
-
-.modal-content {
-  background-color: #fefefe;
-  margin: 10% auto;
-  padding: 20px;
-  border-radius: 12px;
-  width: 90%;
-  max-width: 600px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-  position: relative;
-  animation: modalFadeIn 0.3s;
-}
-
-@keyframes modalFadeIn {
-  from {opacity: 0; transform: translateY(-50px);}
-  to {opacity: 1; transform: translateY(0);}
-}
-
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 15px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid #eee;
-}
-
-.modal-title {
-  font-size: 20px;
-  font-weight: bold;
-  color: #1976d2;
-}
-
-.close-btn {
-  color: #aaa;
-  font-size: 28px;
-  font-weight: bold;
-  cursor: pointer;
-  line-height: 1;
-}
-
-.close-btn:hover {
-  color: #333;
-}
-
-.modal-body {
-  margin-bottom: 15px;
-  line-height: 1.6;
-  max-height: 60vh;
-  overflow-y: auto;
-}
-
-.modal-body ul {
-  padding-left: 20px;
-  margin: 10px 0;
-}
-
-.modal-body li {
-  margin-bottom: 5px;
-}
-
-.modal-footer {
-  text-align: right;
-}
-
-.confirm-btn {
-  padding: 10px 20px;
-  background-color: #1976d2;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 16px;
-  transition: background-color 0.2s;
-}
-
-.confirm-btn:hover {
-  background-color: #1565c0;
-}
-
-/* 响应式设计 */
-@media (max-width: 768px) {
-  .category-button {
-    min-width: calc(50% - 8px);
-    font-size: 13px;
-  }
-  
-  .modal-content {
-    margin: 15% auto;
-    padding: 15px;
-  }
-  
-  .double-click-hint {
-    display: inline-block;
-  }
-}
-
-@media (max-width: 480px) {
-  body {
-    padding: 8px;
-  }
-  
-  .category-button {
-    min-width: 100%;
-  }
-  
-  .modal-content {
-    margin: 20% auto;
-    width: 95%;
-    padding: 12px;
-  }
-  
-  .modal-title {
-    font-size: 18px;
-  }
-  
-  .double-click-hint {
-    display: inline-block;
-  }
-}
-
-/* 电视和大屏幕设备 */
-@media (min-width: 1920px) {
-  body {
-    font-size: 18px;
-  }
-  
-  .container {
-    max-width: 1600px;
-  }
-  
-  .input-field {
-    height: 60px;
-    font-size: 20px;
-  }
-  
-  .category-button {
-    height: 60px;
-    font-size: 20px;
-  }
-  
-  .result-item {
-    padding: 20px;
-  }
-  
-  .result-title {
-    font-size: 22px;
-  }
-  
-  .result-url {
-    font-size: 18px;
-  }
-  
-  .type-tag {
-    font-size: 16px;
-    padding: 4px 10px;
-  }
-}
-
-/* 手表和小屏幕设备 */
-@media (max-width: 320px) {
-  .category-button {
-    font-size: 12px;
-    padding: 0 4px;
-  }
-  
-  .input-field {
-    font-size: 14px;
-    padding: 0 12px;
-  }
-}
-
-/* iOS Safari特定优化 */
-@supports (-webkit-touch-callout: none) {
-  .input-field {
-    font-size: 16px; /* 防止iOS缩放 */
-  }
-}
-
-/* 防止移动设备上的点击高亮 */
-@media (max-device-width: 1024px) {
-  .category-button, .result-item, .close-btn, .confirm-btn {
-    -webkit-tap-highlight-color: transparent;
-  }
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎬 VIDEO PLAYER</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial; background: #fff; color: #000; }
+        .container { max-width: 100%; margin: 0 auto; padding: 0 8px; }
+        
+        .header { background: #fff; padding: 16px 0; }
+        .logo { 
+            background: #fff; border-radius: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
+            padding: 16px; text-align: center; margin-bottom: 16px; cursor: pointer;
+        }
+        .logo:hover { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.15); }
+        
+        .menu-area { background: #fff; padding: 8px; border-radius: 8px; margin-bottom: 16px; }
+        .input-container { 
+            background: #fff; border-radius: 24px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+            margin: 8px 16px; overflow: hidden;
+        }
+        .input-field { 
+            width: 100%; height: 48px; border: none; outline: none; padding: 0 16px; 
+            font-size: 14px; font-weight: bold; background: transparent;
+        }
+        
+        .btn-row { display: flex; flex-wrap: wrap; margin: 4px 0; }
+        .btn { 
+            flex: 1; min-width: calc(50% - 8px); margin: 4px; height: 48px; background: #fff;
+            border-radius: 24px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display: flex; 
+            align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s;
+            font-weight: bold; font-size: 14px; border: none; outline: none;
+        }
+        .btn:hover { transform: translateY(-1px); box-shadow: 0 4px 8px rgba(0,0,0,0.15); }
+        .btn:active { transform: scale(0.95); }
+        
+        .btn-group { display: none; flex-direction: column; margin: 8px 0; }
+        
+        .webview-container { 
+            width: 100%; height: 60vh; margin: 8px 0 16px; border-radius: 8px; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1); overflow: hidden; background: #1E1E1E;
+        }
+        .webview { width: 100%; height: 100%; border: none; background: #fff; }
+        
+        .exit-btn {
+            position: fixed; top: 15px; right: 15px; width: 40px; height: 40px;
+            background: #ffffff; color: #000000; border: none; border-radius: 50%;
+            cursor: pointer; z-index: 1001; display: none; align-items: center; 
+            justify-content: center; font-size: 18px; box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            transition: all 0.3s ease; opacity: 1;
+            border: 1px solid #e0e0e0;
+        }
+        .exit-btn:hover { 
+            background: #f5f5f5; 
+            transform: scale(1.1); 
+            opacity: 1 !important; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+        }
+        .exit-btn:active { transform: scale(0.95); }
+        
+        .hidden { display: none !important; }
+        
+        .fullscreen { 
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; 
+            z-index: 1000; margin: 0; border-radius: 0;
+        }
+        .fullscreen .webview { height: 100vh; }
+    </style>
 </head>
 <body>
-<!-- 弹窗 -->
-<div id="welcomeModal" class="modal">
-<div class="modal-content">
-<div class="modal-header">
-<span class="modal-title">PLAYER多功能工具声明</span>
-<span class="close-btn">&times;</span>
-</div>
-<div class="modal-body">
-<p><strong>欢迎使用PLAYER多功能工具！</strong></p>
-<p>本工具提供视频解析、资源搜索、音乐搜索、漫画搜索和直达站点等功能，旨在为用户提供便捷的多媒体资源访问体验。</p>
-<p><strong>使用说明：</strong></p>
-<ul>
-<li>输入视频链接可使用"视频解析"功能</li>
-<li>输入关键词可使用各类搜索功能</li>
-<li>"直达站点"可直接访问常用资源网站</li>
-<li><strong>双击结果项可打开链接</strong></li>
-</ul>
-<p><strong>免责声明：</strong></p>
-<p>本工具仅提供第三方网站链接，不存储任何资源内容。使用本工具即表示您同意自行承担使用风险，请遵守相关法律法规。</p>
-<p>部分功能可能因网站变更而失效，我们会定期更新维护。</p>
-<p>QQ交流群：636959122</p>
-</div>
-<div class="modal-footer">
-<button class="confirm-btn">我明白了</button>
-</div>
-</div>
-</div>
+    <div class="container">
+        <div class="header">
+            <div class="logo" id="logo">🎬 VIDEO PLAYER(点击)</div>
+            
+            <div class="menu-area" id="menuArea">
+                <div class="input-container">
+                    <input type="text" class="input-field" id="inputUrl" placeholder="视频地址/名称 音乐/漫画名称...">
+                </div>
+                
+                <div id="buttonContainer"></div>
+            </div>
+        </div>
+        
+        <div class="webview-container" id="webViewContainer">
+            <iframe class="webview" id="webView" src="about:blank"></iframe>
+        </div>
+        
+        <button class="exit-btn" id="exitFullscreenBtn">✕</button>
+        
+        <div style="text-align: center; padding: 16px; color: #666; font-size: 12px;">
+            <p>PLAYER - 支持多种资源解析查找</p>
+        </div>
+    </div>
 
-<div class="container">
-<input type="text" class="input-field" id="inputUrl" placeholder="输入视频地址或搜索内容" autocomplete="off">
-<div id="inputHint" class="input-hint"></div>
-<div id="errorMessage" class="error-message"></div>
-
-<div class="button-row">
-<div class="category-button active" data-category="video">视频解析</div>
-<div class="category-button" data-category="resource">资源搜索</div>
-<div class="category-button" data-category="music">音乐搜索</div>
-<div class="category-button" data-category="search">漫画搜索</div>
-<div class="category-button" data-category="direct">直达站点</div>
-</div>
-
-<div id="videoResults" class="results-container"></div>
-<div id="resourceResults" class="results-container"></div>
-<div id="musicResults" class="results-container"></div>
-<div id="searchResults" class="results-container"></div>
-<div id="directResults" class="results-container"></div>
-</div>
-
-<script>
-const inputUrl = document.getElementById('inputUrl');
-const inputHint = document.getElementById('inputHint');
-const errorMessage = document.getElementById('errorMessage');
-const categoryButtons = document.querySelectorAll('.category-button');
-const resultsContainers = {
-  video: document.getElementById('videoResults'),
-  resource: document.getElementById('resourceResults'),
-  music: document.getElementById('musicResults'),
-  search: document.getElementById('searchResults'),
-  direct: document.getElementById('directResults')
-};
-
-// 弹窗元素
-const modal = document.getElementById('welcomeModal');
-const closeBtn = document.querySelector('.close-btn');
-const confirmBtn = document.querySelector('.confirm-btn');
-
-let currentCategory = 'video';
-let inputType = null; // 'url' 或 'text'
-
-// 定义各分类的解析接口
-const apiEndpoints = {
-  video: [
-  { name: '播放一', url: 'https://www.yemu.xyz/v/d.php?url={url}' },
-  { name: '播放二', url: 'https://jx.xmflv.cc/?url={url}' },
-  { name: '播放三', url: 'https://player.bingdou.vip/?url={url}' },
-  { name: '播放四', url: 'https://www.yemu.xyz/?url={url}' },
-  { name: '播放五', url: 'http://111.6.188.162/bbqq.php?url={url}' },
-  { name: '播放六', url: 'https://bd.jx.cn/?url={url}' },
-  { name: '播放七', url: 'https://www.pouyun.com/?url={url}' },
-  { name: '播放八', url: 'https://jx.2s0.cn/player/?url={url}' },
-  { name: '播放九', url: 'https://jx.2s0.cn/player/analysis.php?v={url}' },
-  { name: '播放十', url: 'https://jx.nnxv.cn/tv.php?url={url}' },
-  { name: '超强解析', url: 'https://jx.playerjy.com/?url={url}' }
-  ],
-  resource: [
-  { name: '名字搜一', url: 'https://z1.im1907.top/?jx={text}' },
-  { name: '名字搜二', url: 'http://v9j.net/so.php?wd={text}' },
-  { name: '名字搜三', url: 'https://xunlei8.me/s/{text}.html' },
-  { name: '名字搜四', url: 'https://moduzy.net/api.php/provide/vod/?ac=detail&wd={text}&pg=1' },
-  { name: '视频资源一', url: 'http://yinghuadm.cn/search_-------------.html?wd={text}' },
-  { name: '视频资源二', url: 'https://sszzyy.com/index.php/vod/search.html?wd={text}' },
-  { name: '视频资源三', url: 'https://www.ylys.tv/vodsearch/-------------/wd/{text}' },
-  { name: '视频资源四', url: 'https://www.czzymovie.com/xsss1O1?q={text}' },
-  { name: '视频资源五', url: 'http://660f.com/vodsearch/-------------.html?wd={text}' },
-  { name: '视频资源六', url: 'https://www.wwgz.cn/index.php?m=vod-search&wd={text}' }
-  ],
-  music: [
-  { name: '音乐一', url: 'https://www.1mp3.top/?key={text}&search=1' },
-  { name: '音乐二', url: 'https://www.gequhai.com/s/{text}' },
-  { name: '音乐三', url: 'https://pjmp3.com/search.php?keyword={text}' },
-  { name: '音乐四', url: 'https://www.gequbao.com/s/{text}' },
-  { name: '音乐五', url: 'https://www.flmp3.pro/search.html?keyword={text}' },
-  { name: '音乐资源一', url: 'https://yym4.com/search/{text}' },
-  { name: '音乐资源二', url: 'https://www.5song.xyz/search.html?keyword={text}' }
-  ],
-  search: [
-  { name: '漫画一', url: 'https://www.mhw1.com/search?key={text}' },
-  { name: '漫画二', url: 'https://www.gfmh.app/index.php/search?key={text}' },
-  { name: '漫画三', url: 'https://www.colamanga.com/search?type=1&searchString={text}' },
-  { name: '漫画四', url: 'http://m.bengou.co/statics/search.aspx?key={text}' },
-  { name: '漫画五', url: 'https://godamh.com/s/{text}' },
-  { name: '漫画六', url: 'https://cn.baozimhcn.com/search?q={text}' }
-  ],
-  direct: [
-  { name: '小游戏一', url: 'https://www.yikm.net/nes?page=1&tag=&e=2' },
-  { name: '小游戏二', url: 'https://dos.lol/' },
-  { name: '小游戏三', url: 'https://zaixianwan.app/' },
-  { name: '小游戏四', url: 'https://zh.y8.com/' },
-  { name: '小游戏五', url: 'https://www.crazygames.com/' },
-  { name: '小游戏六', url: 'https://poki.com/zh' },
-  { name: '短视频下载一', url: 'https://www.v2ob.com/douyin' },
-  { name: '影视一', url: 'https://www.ynqihan.com/' },
-  { name: '影视二', url: 'https://haifengyi.com/' },
-  { name: '影视三', url: 'https://www.puromotors.com/' },
-  { name: '随机音乐一', url: 'https://music.mcya.cn/' },
-  { name: '随机音乐二', url: 'https://netease-music.fe-mm.com/#/music/playlist' },
-  { name: '音源一', url: 'https://mu-jie.cc/musicBox/?src=www.jspoo.com#/' },
-  { name: '音源二', url: 'https://www.buguyy.top/' },
-  { name: '音源三', url: 'https://www.qqmp3.vip/' },
-  { name: '音源四', url: 'https://suapi.net/tool/music' },
-  { name: '音源五', url: 'https://tools.liumingye.cn/music/' },
-  { name: '漫源一', url: 'http://rumanhua1.com/?src=www.jspoo.com' }
-  ]
-};
-
-// 初始化
-init();
-
-function init() {
-    // 显示弹窗
-    showModal();
-
-    // 输入框事件监听
-    inputUrl.addEventListener('input', checkInputType);
-    
-    // 添加键盘事件支持
-    inputUrl.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            showCategory(currentCategory);
-        }
-    });
-
-    // 点击分类按钮
-    categoryButtons.forEach(button => {
-      button.addEventListener('click', function() {
-          currentCategory = this.dataset.category;
-          showCategory(currentCategory);
-        });
-      });
-
-      // 默认显示第一个分类
-      showCategory('video');
-
-      // 弹窗关闭事件
-      closeBtn.addEventListener('click', closeModal);
-      confirmBtn.addEventListener('click', closeModal);
-
-      // 点击弹窗外部关闭
-      window.addEventListener('click', function(event) {
-          if (event.target === modal) {
-              closeModal();
+    <script>
+        // 配置数据
+        const config = {
+            categories: [
+                { id: 'video', name: '视频解析', color: '#2196F3' },
+                { id: 'resource', name: '名称搜索', color: '#FF9800' },
+                { id: 'music', name: '音乐搜索', color: '#4CAF50' },
+                { id: 'search', name: '漫画搜索', color: '#9C27B0' },
+                { id: 'fullscreen', name: '竖屏全屏', action: 'verticalFullscreen' }
+            ],
+            
+            buttons: {
+                video: [
+                    { text: '播放一', url: url => `https://www.yemu.xyz/v/d.php?url=${extractUrl(url)}` },
+                    { text: '播放二', url: url => `https://jx.xmflv.cc/?url=${extractUrl(url)}` },
+                    { text: '播放三', url: url => `https://player.bingdou.vip/?url=${extractUrl(url)}` },
+                    { text: '播放四', url: url => `https://www.yemu.xyz/?url=${extractUrl(url)}` },
+                    { text: '播放五', url: url => `https://bd.jx.cn/?url=${extractUrl(url)}` },
+                    { text: '播放六', url: url => `http://111.6.188.162/bbqq.php?url=${extractUrl(url)}` },
+                    { text: '播放七', url: url => `https://www.pouyun.com/?url=${extractUrl(url)}` },
+                    { text: '播放八', url: url => `https://jx.2s0.cn/player/?url=${extractUrl(url)}` },
+                    { text: '播放九', url: url => `https://jx.2s0.cn/player/analysis.php?v=${extractUrl(url)}` },
+                    { text: '播放十', url: url => `https://jx.nnxv.cn/tv.php?url=${extractUrl(url)}` },
+                    { text: '播放十一', url: url => `https://jx.aidoubo.net/?url=${extractUrl(url)}` },
+                    { text: '播放十二', url: url => `https://jx.m3u8.tv/jiexi/?url=${extractUrl(url)}` },
+                    { text: '超强解析', url: url => `https://jx.playerjy.com/?url=${extractUrl(url)}` }
+                ],
+                
+                resource: [
+                    { text: '名字搜一', url: text => `https://z1.im1907.top/?jx=${text}` },
+                    { text: '名字搜二', url: text => `http://v9j.net/so.php?wd=${text}` },
+                    { text: '名字搜三', url: text => `https://xunlei8.me/s/${text}.html` },
+                    { text: '名字搜四', url: text => `https://moduzy.net/api.php/provide/vod/?ac=detail&wd=${text}&pg=1` },
+                    { text: '资源一', url: text => `http://yinghuadm.cn/search_-------------.html?wd=${text}` },
+                    { text: '资源二', url: text => `https://sszzyy.com/index.php/vod/search.html?wd=${text}` },
+                    { text: '资源三', url: text => `https://www.ylys.tv/vodsearch/-------------/wd/${text}` },
+                    { text: '资源四', url: text => `http://660f.com/vodsearch/-------------.html?wd=${text}` },
+                    { text: '资源五', url: text => `https://www.czzymovie.com/xsss1O1?q=${text}` },
+                    { text: '资源六', url: text => `https://www.wwgz.cn/index.php?m=vod-search&wd=${text}` },
+                    { text: '资源七', url: text => `https://www.kan.cc/search.php?searchword=${text}` },
+                    { text: '资源八', url: text => `https://www.88hd.com/vodsearch/-------------.html?wd=${text}` },
+                    { text: '影视一', url: () => 'https://www.ynqihan.com/' },
+                    { text: '影视二', url: () => 'https://haifengyi.com/' },
+                    { text: '影视三', url: () => 'https://www.puromotors.com/' },
+                    { text: '影视四', url: () => 'https://www.4kvm.com/' }
+                ],
+                
+                music: [
+                    { text: '音乐一', url: text => `https://yym4.com/search/${text}` },
+                    { text: '音乐二', url: text => `https://www.5song.xyz/search.html?keyword=${text}` },
+                    { text: '音乐三', url: text => `https://www.1mp3.top/?key=${text}&search=1` },
+                    { text: '音乐四', url: text => `https://www.gequhai.com/s/${text}` },
+                    { text: '音乐五', url: text => `https://pjmp3.com/search.php?keyword=${text}` },
+                    { text: '音乐六', url: text => `https://www.gequbao.com/s/${text}` },
+                    { text: '音乐七', url: text => `https://www.flmp3.pro/search.html?keyword=${text}` },
+                    { text: '音乐八', url: text => `https://www.kuwo.cn/search/list?key=${text}` },
+                    { text: '音源一', url: () => 'https://mu-jie.cc/musicBox/' },
+                    { text: '音源二', url: () => 'https://suapi.net/tool/music' },
+                    { text: '音源三', url: () => 'https://www.buguyy.top/' },
+                    { text: '音源四', url: () => 'https://www.qqmp3.vip/' },
+                    { text: '随机一', url: () => 'https://music.mcya.cn/' },
+                    { text: '随机二', url: () => 'https://netease-music.fe-mm.com/' },
+                    { text: '随机三', url: () => 'https://music.163.com/' },
+                    { text: '随机四', url: () => 'https://www.kugou.com/' }
+                ],
+                
+                search: [
+                    { text: '漫画一', url: text => `https://www.mhw1.com/search?key=${text}` },
+                    { text: '漫画二', url: text => `https://www.gfmh.app/index.php/search?key=${text}` },
+                    { text: '漫画三', url: text => `https://www.colamanga.com/search?type=1&searchString=${text}` },
+                    { text: '漫画四', url: text => `http://m.bengou.co/statics/search.aspx?key=${text}` },
+                    { text: '漫画五', url: text => `https://godamh.com/s/${text}` },
+                    { text: '漫画六', url: text => `https://cn.baozimhcn.com/search?q=${text}` },
+                    { text: '漫画七', url: text => `https://www.manhuagui.com/search/?q=${text}` },
+                    { text: '漫画八', url: text => `https://www.dm5.com/search?title=${text}` },
+                    { text: '漫源一', url: () => 'http://rumanhua1.com/' },
+                    { text: '漫源二', url: () => 'https://www.manhuadb.com/' },
+                    { text: '漫源三', url: () => 'https://www.177mh.net/' },
+                    { text: '漫源四', url: () => 'https://www.mkzhan.com/' }
+                ]
             }
-          });
-    }
+        };
 
-    // 显示弹窗
-    function showModal() {
-        modal.style.display = 'block';
-        // 存储已显示弹窗的状态
-        localStorage.setItem('playerToolModalShown', 'true');
-      }
+        // 状态管理
+        const state = {
+            fullscreen: false,
+            verticalFullscreen: false,
+            menuVisible: true,
+            categoryVisible: {},
+            hideTimeout: null
+        };
 
-      // 关闭弹窗
-      function closeModal() {
-          modal.style.display = 'none';
+        // DOM元素
+        const elements = {
+            logo: document.getElementById('logo'),
+            menuArea: document.getElementById('menuArea'),
+            inputUrl: document.getElementById('inputUrl'),
+            webView: document.getElementById('webView'),
+            webViewContainer: document.getElementById('webViewContainer'),
+            exitBtn: document.getElementById('exitFullscreenBtn'),
+            buttonContainer: document.getElementById('buttonContainer')
+        };
+
+        // 工具函数
+        function extractUrl(text) {
+            if (!text) return null;
+            const match = text.match(/(https?:\/\/[^\s]+|www\.[^\s]+|[a-zA-Z0-9-]+\.[a-zA-Z0-9-]+\.[a-zA-Z0-9-]+\/?[^\s]*)/);
+            if (match) {
+                let url = match[0];
+                if (!url.startsWith('http')) url = 'http://' + url;
+                return url;
+            }
+            return null;
         }
 
-        function checkInputType() {
-            const inputText = inputUrl.value.trim();
+        function copyToClipboard(text) {
+            if (!text) return alert("没有内容可复制");
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                alert("链接已复制到剪贴板");
+            } catch {
+                alert("无法访问剪贴板");
+            } finally {
+                document.body.removeChild(textArea);
+            }
+        }
 
-            // 清空提示和错误
-            hideHint();
-            hideError();
+        // 创建按钮
+        function createButton(text, onClick, className = 'btn') {
+            const button = document.createElement('button');
+            button.className = className;
+            button.textContent = text;
+            button.onclick = onClick;
+            return button;
+        }
 
-            if (!inputText) {
-                inputType = null;
-                resetButtonRecommendations();
-                return;
-              }
+        // 创建按钮组
+        function createButtonGroup(buttons, category) {
+            const group = document.createElement('div');
+            group.className = 'btn-group';
+            group.id = `${category}Buttons`;
 
-              // 检查是否为URL
-              if (isUrl(inputText)) {
-                  inputType = 'url';
-                  showHint('检测到您输入的是链接，请使用"视频解析"功能');
-                  recommendButtons(['video']);
-                } else {
-                  inputType = 'text';
-                  // 检查文本中是否包含疑似URL
-                  if (containsUrl(inputText)) {
-                      showHint('文本搜索不应包含链接，请删除链接或使用"视频解析"功能');
-                      recommendButtons(['video']);
-                    } else {
-                      showHint('检测到您输入的是文本，请使用搜索功能');
-                      recommendButtons(['resource', 'music', 'search']);
-                    }
-                  }
+            // 每2个按钮一行
+            for (let i = 0; i < buttons.length; i += 2) {
+                const row = document.createElement('div');
+                row.className = 'btn-row';
+                
+                for (let j = i; j < i + 2 && j < buttons.length; j++) {
+                    const btnConfig = buttons[j];
+                    const button = createButton(btnConfig.text, () => {
+                        if (btnConfig.url) {
+                            const inputText = elements.inputUrl.value;
+                            const url = btnConfig.url(inputText);
+                            if (url) elements.webView.src = url;
+                            else alert(btnConfig.text.includes('播放') ? "请输入有效网址" : "请输入搜索内容");
+                        }
+                    });
+                    row.appendChild(button);
                 }
+                group.appendChild(row);
+            }
+            return group;
+        }
 
-                function showCategory(category) {
-                    // 检查输入类型与分类是否匹配
-                    if (inputType && !isCategoryMatch(category)) {
-                        showError(getMismatchError(category));
-                        return;
-                      }
+        // 处理工具按钮动作
+        function handleToolAction(action) {
+            switch(action) {
+                case 'verticalFullscreen':
+                    setVerticalFullscreen(true);
+                    break;
+            }
+        }
 
-                      // 更新活动按钮样式
-                      categoryButtons.forEach(btn => {
-                        btn.classList.remove('active');
-                        btn.classList.remove('recommended');
-                      });
-                      document.querySelector(`.category-button[data-category="${category}"]`).classList.add('active');
+        // 全屏功能
+        function setFullscreen(full) {
+            state.fullscreen = full;
+            state.verticalFullscreen = false;
+            
+            if (full) {
+                elements.webViewContainer.classList.add('fullscreen');
+                document.body.style.overflow = 'hidden';
+                elements.menuArea.classList.add('hidden');
+                showExitButton(true);
+            } else {
+                elements.webViewContainer.classList.remove('fullscreen');
+                document.body.style.overflow = 'auto';
+                elements.menuArea.classList.remove('hidden');
+                showExitButton(false);
+            }
+        }
 
-                      // 隐藏所有结果容器
-                      Object.values(resultsContainers).forEach(container => {
-                        container.style.display = 'none';
-                      });
+        function setVerticalFullscreen(full) {
+            state.verticalFullscreen = full;
+            state.fullscreen = false;
+            
+            if (full) {
+                elements.webViewContainer.classList.add('fullscreen');
+                document.body.style.overflow = 'hidden';
+                elements.menuArea.classList.add('hidden');
+                showExitButton(true);
+            } else {
+                elements.webViewContainer.classList.remove('fullscreen');
+                document.body.style.overflow = 'auto';
+                elements.menuArea.classList.remove('hidden');
+                showExitButton(false);
+            }
+        }
 
-                      // 显示当前分类的结果容器
-                      const currentContainer = resultsContainers[category];
-                      currentContainer.style.display = 'block';
+        function showExitButton(show) {
+            if (show) {
+                elements.exitBtn.style.display = 'flex';
+                elements.exitBtn.style.opacity = '1';
+                
+                clearTimeout(state.hideTimeout);
+                state.hideTimeout = setTimeout(() => {
+                    elements.exitBtn.style.opacity = '0';
+                }, 3000);
+            } else {
+                elements.exitBtn.style.display = 'none';
+                elements.exitBtn.style.opacity = '1';
+            }
+        }
 
-                      // 处理直达站点
-                      if (category === 'direct') {
-                          displayDirectSites(currentContainer);
-                        } else {
-                          const inputText = inputUrl.value.trim();
-                          displayLinks(category, inputText);
+        function exitFullscreen() {
+            setFullscreen(false);
+            setVerticalFullscreen(false);
+        }
+
+        // 初始化界面
+        function init() {
+            // 创建主按钮（每行2个）
+            let currentRow = null;
+            
+            config.categories.forEach((cat, index) => {
+                // 每2个按钮创建新的一行
+                if (index % 2 === 0) {
+                    currentRow = document.createElement('div');
+                    currentRow.className = 'btn-row';
+                    elements.buttonContainer.appendChild(currentRow);
+                }
+                
+                const button = createButton(cat.name, () => {
+                    if (cat.action) {
+                        // 如果是功能按钮（全屏）
+                        handleToolAction(cat.action);
+                    } else {
+                        // 如果是分类按钮
+                        state.categoryVisible[cat.id] = !state.categoryVisible[cat.id];
+                        const group = document.getElementById(`${cat.id}Buttons`);
+                        if (group) {
+                            group.style.display = state.categoryVisible[cat.id] ? 'flex' : 'none';
                         }
+                    }
+                }, 'btn');
+                
+                if (currentRow) {
+                    currentRow.appendChild(button);
+                }
+            });
 
-                        // 隐藏错误信息
-                        hideError();
-                      }
+            // 创建功能按钮组
+            Object.keys(config.buttons).forEach(category => {
+                const group = createButtonGroup(config.buttons[category], category);
+                elements.buttonContainer.appendChild(group);
+            });
 
-                      function displayDirectSites(container) {
-                          container.innerHTML = '';
+            // 事件监听
+            elements.logo.onclick = () => {
+                state.menuVisible = !state.menuVisible;
+                elements.menuArea.classList.toggle('hidden', !state.menuVisible);
+            };
 
-                          apiEndpoints.direct.forEach(site => {
-                            const item = createResultItem(site.name, site.url, 'direct');
+            // 修复退出按钮点击事件
+            elements.exitBtn.addEventListener('click', exitFullscreen);
 
-                            // 双击事件
-                            setupDoubleClickHandler(item, site.url);
-                            
-                            container.appendChild(item);
-                          });
-                        }
+            // 鼠标移动到退出按钮上时恢复显示
+            elements.exitBtn.addEventListener('mouseenter', () => {
+                elements.exitBtn.style.opacity = '1';
+                clearTimeout(state.hideTimeout);
+            });
 
-                        function displayLinks(category, inputText) {
-                            const endpoints = apiEndpoints[category];
-                            const container = resultsContainers[category];
+            elements.exitBtn.addEventListener('mouseleave', () => {
+                if (state.fullscreen || state.verticalFullscreen) {
+                    state.hideTimeout = setTimeout(() => {
+                        elements.exitBtn.style.opacity = '0';
+                    }, 3000);
+                }
+            });
+        }
 
-                            // 清空容器和错误信息
-                            container.innerHTML = '';
-                            hideError();
-
-                            // 检查输入是否为空
-                            if (!inputText) {
-                                return;
-                              }
-
-                              // 处理不同类型的链接
-                              endpoints.forEach(endpoint => {
-                                let finalUrl = endpoint.url;
-
-                                if (endpoint.url.includes('{url}')) {
-                                    // URL解析类型
-                                    const extractedUrl = extractUrl(inputText);
-                                    if (!extractedUrl) {
-                                        const item = createResultItem(endpoint.name, endpoint.url, 'url');
-                                        container.appendChild(item);
-                                        return;
-                                      }
-                                      finalUrl = endpoint.url.replace(/{url}/g, encodeURIComponent(extractedUrl));
-                                    } else if (endpoint.url.includes('{text}')) {
-                                        // 文本搜索类型
-                                        finalUrl = endpoint.url.replace(/{text}/g, encodeURIComponent(inputText));
-                                      }
-
-                                      // 创建结果项
-                                      const item = createResultItem(endpoint.name, finalUrl, category);
-
-                                      // 双击事件
-                                      setupDoubleClickHandler(item, finalUrl);
-
-                                      container.appendChild(item);
-                                    });
-                                  }
-
-                                  function createResultItem(name, url, type) {
-                                      const item = document.createElement('div');
-                                      item.className = 'result-item';
-
-                                      const title = document.createElement('div');
-                                      title.className = 'result-title';
-                                      title.textContent = name;
-
-                                      // 添加双击提示
-                                      const doubleClickHint = document.createElement('span');
-                                      doubleClickHint.className = 'double-click-hint';
-                                      doubleClickHint.textContent = '双击打开';
-                                      title.appendChild(doubleClickHint);
-
-                                      // 修复后的标签类型判断逻辑
-                                      const typeTag = document.createElement('span');
-                                      typeTag.className = 'type-tag';
-
-                                      // 根据分类类型设置标签
-                                      if (type === 'direct') {
-                                          typeTag.textContent = '直达站点';
-                                        } else if (type === 'video') {
-                                            typeTag.textContent = 'URL解析';
-                                          } else {
-                                            typeTag.textContent = '文本搜索';
-                                          }
-
-                                          title.appendChild(typeTag);
-
-                                          const urlElement = document.createElement('div');
-                                          urlElement.className = 'result-url';
-                                          urlElement.textContent = url;
-
-                                          item.appendChild(title);
-                                          item.appendChild(urlElement);
-
-                                          return item;
-                                        }
-
-                                        // 设置双击事件处理
-                                        function setupDoubleClickHandler(element, url) {
-                                            let clickCount = 0;
-                                            let clickTimer = null;
-                                            
-                                            element.addEventListener('click', function() {
-                                                clickCount++;
-                                                
-                                                if (clickCount === 1) {
-                                                    clickTimer = setTimeout(function() {
-                                                        clickCount = 0;
-                                                    }, 300);
-                                                } else if (clickCount === 2) {
-                                                    clearTimeout(clickTimer);
-                                                    clickCount = 0;
-                                                    window.open(url, '_blank');
-                                                }
-                                            });
-                                            
-                                            // 移动设备触摸事件处理
-                                            let touchCount = 0;
-                                            let touchTimer = null;
-                                            
-                                            element.addEventListener('touchstart', function() {
-                                                touchCount++;
-                                                
-                                                if (touchCount === 1) {
-                                                    touchTimer = setTimeout(function() {
-                                                        touchCount = 0;
-                                                    }, 300);
-                                                } else if (touchCount === 2) {
-                                                    clearTimeout(touchTimer);
-                                                    touchCount = 0;
-                                                    window.open(url, '_blank');
-                                                }
-                                            }, {passive: true});
-                                        }
-
-                                        // 检查是否为URL
-                                        function isUrl(text) {
-                                            return extractUrl(text) !== null;
-                                          }
-
-                                          // 检查文本中是否包含URL
-                                          function containsUrl(text) {
-                                              const urlPattern = /(https?:\/\/|www\.)[^\s]+/;
-                                              return urlPattern.test(text);
-                                            }
-
-                                            // 从文本中提取URL
-                                            function extractUrl(text) {
-                                                if (!text) return null;
-                                                  const urlMatch = text.match(/(https?:\/\/[^\s]+)|(www\.[^\s]+)|([^\s]+\.[^\s]+\.[^\s]+)/);
-                                                  return urlMatch ? (urlMatch[0].startsWith('http') ? urlMatch[0] : 'http://' + urlMatch[0]) : null;
-                                                }
-
-                                                // 检查分类是否匹配输入类型
-                                                function isCategoryMatch(category) {
-                                                    if (category === 'direct') return true;
-                                                      if (inputType === 'url') return category === 'video';
-                                                        if (inputType === 'text') return ['resource', 'music', 'search'].includes(category);
-                                                          return true;
-                                                        }
-
-                                                        // 获取不匹配错误信息
-                                                        function getMismatchError(category) {
-                                                            if (inputType === 'url') {
-                                                                return '您输入的是链接，请使用"视频解析"功能';
-                                                              } else {
-                                                                return '您输入的是文本，请使用搜索功能（资源搜索/音乐搜索/漫画搜索）';
-                                                              }
-                                                            }
-
-                                                            // 推荐按钮
-                                                            function recommendButtons(categories) {
-                                                                resetButtonRecommendations();
-                                                                categories.forEach(category => {
-                                                                  document.querySelector(`.category-button[data-category="${category}"]`).classList.add('recommended');
-                                                                });
-                                                              }
-
-                                                              function resetButtonRecommendations() {
-                                                                  categoryButtons.forEach(btn => btn.classList.remove('recommended'));
-                                                                }
-
-                                                                // 显示提示信息
-                                                                function showHint(message) {
-                                                                    inputHint.textContent = message;
-                                                                    inputHint.style.display = 'block';
-                                                                  }
-
-                                                                  // 隐藏提示信息
-                                                                  function hideHint() {
-                                                                      inputHint.style.display = 'none';
-                                                                    }
-
-                                                                    // 显示错误信息
-                                                                    function showError(message) {
-                                                                        errorMessage.textContent = message;
-                                                                        errorMessage.style.display = 'block';
-                                                                      }
-
-                                                                      // 隐藏错误信息
-                                                                      function hideError() {
-                                                                          errorMessage.style.display = 'none';
-                                                                        }
-                                                                        </script>
-                                                                        </body>
-</html>
+        // 启动
+        init();
+        console.log("视频播放器已初始化 - 简化版");
+    </script>
+</body>
+  </html>
