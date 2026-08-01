@@ -1,63 +1,65 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="zh-CN">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Link Board</title>
-<style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #f5f5f5; padding: 20px; }
-.search-box { display: block; width: 100%; max-width: 500px; margin: 0 auto 24px; padding: 12px 16px; font-size: 16px; border: 1px solid #ddd; border-radius: 8px; outline: none; }
-.search-box:focus { border-color: #4a90d9; box-shadow: 0 0 0 2px rgba(74,144,217,0.2); }
-.grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; max-width: 900px; margin: 0 auto; }
-.card { display: block; padding: 16px; background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; text-decoration: none; color: #333; transition: box-shadow 0.2s; }
-.card:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.12); }
-.card .name { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
-.card .url { font-size: 12px; color: #999; word-break: break-all; }
-.empty { grid-column: 1 / -1; text-align: center; color: #999; padding: 40px 0; }
-@media (max-width: 600px) { .grid { grid-template-columns: 1fr; } }
-</style>
+    <!-- 强制IE使用最新渲染模式 -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    
+    <!-- ★★★ 核心：移动端视口配置（解决手机显示为电脑版的问题） ★★★ -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    
+    <!-- 禁止手机浏览器自动识别数字为电话号码 -->
+    <meta name="format-detection" content="telephone=no">
+    
+    <!-- 全屏模式下隐藏浏览器地址栏（部分手机支持） -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    
+    <title>全屏嵌入</title>
+    
+    <style>
+        /* 彻底重置内外边距，确保无空白 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;  /* 禁止滚动，避免出现白边 */
+            background: #000;  /* 加载时的背景色 */
+        }
+        
+        /* iframe 全屏填满 */
+        iframe {
+            display: block;
+            width: 100vw;
+            height: 100vh;
+            height: calc(var(--vh, 1vh) * 100); /* 兼容移动端地址栏高度问题 */
+            border: none;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
 </head>
 <body>
 
-<input class="search-box" placeholder="搜索名称或链接..." oninput="filter(this.value)">
+    <!-- 将 src="这里换成你的网址" -->
+    <iframe src="https://www.tiktok.com/"></iframe>
 
-<div class="grid" id="grid">
-  <a class="card" href="https://github.com" target="_blank"><div class="name">GitHub</div><div class="url">https://github.com</div></a>
-  <a class="card" href="https://google.com" target="_blank"><div class="name">Google</div><div class="url">https://google.com</div></a>
-  <a class="card" href="https://youtube.com" target="_blank"><div class="name">YouTube</div><div class="url">https://youtube.com</div></a>
-  <a class="card" href="https://baidu.com" target="_blank"><div class="name">百度</div><div class="url">https://baidu.com</div></a>
-  <a class="card" href="https://stackoverflow.com" target="_blank"><div class="name">Stack Overflow</div><div class="url">https://stackoverflow.com</div></a>
-  <a class="card" href="https://chatgpt.com" target="_blank"><div class="name">ChatGPT</div><div class="url">https://chatgpt.com</div></a>
-  <a class="card" href="https://app-c7510mnz59tt.appmiaoda.com/login" target="_blank"><div class="name">企业网盘</div><div class="url">https://app-c7510mnz59tt.appmiaoda.com</div></a>
-  <a class="card" href="https://m.downza.cn/soft/10392250.html" target="_blank"><div class="name">谷歌浏览器</div><div class="url">https://m.downza.cn</div></a>
-  <a class="card" href="https://my.dnshe.com" target="_blank"><div class="name">免费域名</div><div class="url">https://my.dnshe.com</div></a>
-  <a class="card" href="https://www.fastredir.cn" target="_blank"><div class="name">隐性转发</div><div class="url">https://www.fastredir.cn</div></a>
-  <a class="card" href="https://m.gamedog.cn/down/32934.html" target="_blank"><div class="name">OP框架</div><div class="url">https://m.gamedog.cn</div></a>
-  <a class="card" href="https://share.feijipan.com/s/VdN6mJIm" target="_blank"><div class="name">破解素材</div><div class="url">https://share.feijipan.com/s/VdN6mJIm</div></a>
-  <a class="card" href="http://www.xmsj.org/" target="_blank"><div class="name">音乐搜索器</div><div class="url">http://www.xmsj.org/</div></a>
-  
-</div>
-
-<script>
-function filter(kw) {
-  kw = kw.toLowerCase();
-  var cards = document.querySelectorAll('.card');
-  var visible = 0;
-  cards.forEach(function(c) {
-    var text = c.textContent.toLowerCase();
-    var show = text.includes(kw);
-    c.style.display = show ? '' : 'none';
-    if (show) visible++;
-  });
-  var empty = document.querySelector('.empty');
-  if (visible === 0 && !empty) {
-    document.getElementById('grid').innerHTML += '<div class="empty">没有找到匹配的结果</div>';
-  } else if (visible > 0 && empty) {
-    empty.remove();
-  }
-}
-</script>
+    <script>
+        // 解决移动端地址栏导致100vh偏大的问题（动态获取真实视口高度）
+        function setRealHeight() {
+            let vh = window.innerHeight * 0.01;
+            document.documentElement.style.setProperty('--vh', vh + 'px');
+        }
+        setRealHeight();
+        window.addEventListener('resize', setRealHeight);
+        
+        // 如果嵌入的网站不允许被iframe嵌套，会跳转失败，这是对方网站的限制
+        // 部分浏览器（如iOS Safari）需额外处理，此脚本已覆盖
+    </script>
 
 </body>
 </html>
